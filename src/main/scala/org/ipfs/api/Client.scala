@@ -7,7 +7,7 @@ import java.nio.file.{Paths, Path}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
-import scala.util.Random
+import java.util.Random
 
 class Client(val host : String, val port: Int,
              val base: String = "/api/v0",
