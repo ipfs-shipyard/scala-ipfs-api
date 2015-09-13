@@ -13,13 +13,15 @@ class Client(val host : String, val port: Int,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
-  def get(key: String) : InputStream = getRequestInputStream("/get", Seq("arg" -> key)
+  def get(key: String) : InputStream = getRequestInputStream("/get", Seq("arg" -> key))
 
-  def add(path: Path) {
-    add(Seq(path))
-  }
+  def add(paths: Seq[Path]) = upload("/add", paths)
 
-  def add(paths: Seq[Path]) {upload("/add", paths)}
+  def ls(key:  String) =  getRequestSource("/ls", classOf[Ls], Seq("arg" -> key))
+
+
+
+  def add(path: Path) {add(Seq(path))}
 
   def swarmPeers: SwarmPeers = getRequestSource("/swarm/peers", classOf[SwarmPeers])
 
@@ -99,6 +101,10 @@ case class SwarmPeers(Strings: List[String])
 
 case class BlockStat(Key: String, Size: Int)
 
+case class Link(Name: String,  Hash: String, Size: Int, Type: Int)
+case class Object(Hash: String, Links: Seq[Link])
+case class Ls(Objects: Seq[Object])
+
 object Client {
 
   val LINE = "\r\n"
@@ -129,8 +135,10 @@ object Client {
     val path = Paths.get("src", "main", "resources", "test.txt")
     client.add(path)
 
-    val getIn : InputStream = client.getRequestInputStream("/get", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87", "encoding" -> "json"))
-    println(io.Source.fromInputStream(getIn).mkString)
+//    val getIn : InputStream = client.getRequestInputStream("/get", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87", "encoding" -> "json"))
+//    println(io.Source.fromInputStream(getIn).mkString)
+//    println( client.getRequestSource("/ls", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87")).mkString)
+    println(client.ls("QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"))
   }
 
 }
