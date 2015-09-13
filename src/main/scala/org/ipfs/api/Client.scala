@@ -21,6 +21,7 @@ class Client(val host : String, val port: Int,
 
 
 
+
   def add(path: Path) {add(Seq(path))}
 
   def swarmPeers: SwarmPeers = getRequestSource("/swarm/peers", classOf[SwarmPeers])
@@ -125,20 +126,24 @@ object Client {
   }
 
   def main(args: Array[String]) = {
-    println("Here")
+
     val client = new Client("localhost", 5001)
 
     println(client.swarmPeers)
 
-    println(client.blockStat("QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"))
+    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+
+    println(client.blockStat(addedHash))
+
+    println(client.ls(addedHash))
+
+    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
 
     val path = Paths.get("src", "main", "resources", "test.txt")
     client.add(path)
 
-//    val getIn : InputStream = client.getRequestInputStream("/get", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87", "encoding" -> "json"))
-//    println(io.Source.fromInputStream(getIn).mkString)
-//    println( client.getRequestSource("/ls", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87")).mkString)
-    println(client.ls("QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"))
+    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
+
   }
 
 }
