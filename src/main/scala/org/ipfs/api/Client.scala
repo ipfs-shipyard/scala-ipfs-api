@@ -1,9 +1,13 @@
 package org.ipfs.api
 
-import java.net.{URLEncoder, URL}
+import java.io._
+import java.net.{HttpURLConnection, URLEncoder, URL}
+import java.nio.file.{Paths, Path}
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+
+import scala.util.Random
 
 class Client(val host : String, val port: Int,
              val base: String = "/api/v0",
@@ -12,27 +16,83 @@ class Client(val host : String, val port: Int,
   val jsonMapper = new ObjectMapper()
   jsonMapper.registerModule(DefaultScalaModule)
 
-  def request(stem: String, query: Seq[(String, String)]) = {
+  def getRequest(stem: String, query: Seq[(String, String)]) = {
     val url = Client.buildUrl(protocol, host, port, base, stem, query)
     scala.io.Source.fromURL(url)
   }
 
-  def request[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : T = {
-    jsonMapper.readValue(request(stem, query).reader(), clazz)
+  def getRequest[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
+    jsonMapper.readValue(getRequest(stem, query).reader(), clazz)
   }
 
-  def swarmPeers : SwarmPeers =  request("/swarm/peers", classOf[SwarmPeers])
+  private def upload(stem: String, paths: Seq[Path]) {
+    val url = Client.buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
 
-  def blockStat(key: String) : BlockStat = request("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+    val conn = url.openConnection().asInstanceOf[HttpURLConnection]
+    conn.setDoOutput(true)
+    conn.setDoInput(true)
+    conn.setRequestMethod("POST")
+    conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary)
 
+    val out = conn.getOutputStream
+        val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"))
+
+    val add = (path: Path) => {
+      val fileName = path.getFileName.toString
+
+      val headers: Seq[String] = Seq(
+        "--" + boundary,
+        "Content-Disposition: file; name=\"file\"; filename=\"" + fileName + "\"",
+        "Content-Type: application/octet-stream",
+        "Content-Transfer-Encoding: binary")
+
+      headers.foreach(writer.append(_).append(Client.LINE))
+      writer.flush()
+
+      val in = new FileInputStream(path.toFile)
+      try {
+        val buffer = new Array[Byte](0x1000)
+        var nRead = 0
+        while ( {
+          nRead = in.read(buffer); nRead
+        } != -1)
+          out.write(buffer, 0, nRead)
+      } finally {
+        writer.append(Client.LINE)
+        out.flush
+        in.close
+      }
+    }
+
+    paths.foreach(add)
+
+    Seq("--", boundary, "--", Client.LINE).foreach(writer.append(_))
+    writer.close
+  }
+
+  def add(path: Path) {
+    add(Seq(path))
+  }
+
+  def add(paths: Seq[Path]) {upload("/add", paths)}
+
+  def swarmPeers: SwarmPeers = getRequest("/swarm/peers", classOf[SwarmPeers])
+
+  def blockStat(key: String): BlockStat = getRequest("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+
+  lazy private val boundary = {
+    val random = new Random()
+    (0 to 32).map(_ => (0x41 + random.nextInt(26)).asInstanceOf[Char]).toArray.mkString
+  }
 }
 
 case class SwarmPeers(Strings: List[String])
 
 case class BlockStat(Key: String, Size: Int)
 
-
 object Client {
+
+  val LINE = "\r\n"
 
   def buildUrl(protocol: String,
                host: String,
@@ -56,6 +116,16 @@ object Client {
     println(client.swarmPeers)
 
     println(client.blockStat("QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"))
+
+    val path = Paths.get("src", "main", "resources", "test.txt")
+    try {
+      val resp = client.add(path)
+      println("add response " +  resp)
+    } catch {
+      case t : Throwable => t.printStackTrace()
+    }
+
+
   }
 
 }
