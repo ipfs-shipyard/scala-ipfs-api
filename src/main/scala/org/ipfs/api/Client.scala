@@ -13,16 +13,35 @@ class Client(val host : String, val port: Int,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
-  val jsonMapper = new ObjectMapper()
-  jsonMapper.registerModule(DefaultScalaModule)
+  def get(key: String) : InputStream = getRequestInputStream("/get", Seq("arg" -> key)
 
-  def getRequest(stem: String, query: Seq[(String, String)]) = {
-    val url = Client.buildUrl(protocol, host, port, base, stem, query)
-    scala.io.Source.fromURL(url)
+  def add(path: Path) {
+    add(Seq(path))
   }
 
-  def getRequest[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
-    jsonMapper.readValue(getRequest(stem, query).reader(), clazz)
+  def add(paths: Seq[Path]) {upload("/add", paths)}
+
+  def swarmPeers: SwarmPeers = getRequestSource("/swarm/peers", classOf[SwarmPeers])
+
+  def blockStat(key: String): BlockStat = getRequestSource("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+
+
+
+  private val jsonMapper = new ObjectMapper()
+  jsonMapper.registerModule(DefaultScalaModule)
+
+  private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
+    val url = Client.buildUrl(protocol, host, port, base, stem, query)
+    url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
+  }
+
+  private def getRequestSource[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
+    jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
+  }
+
+  private def getRequestSource(stem: String, query: Seq[(String, String)]) = {
+    val url = Client.buildUrl(protocol, host, port, base, stem, query)
+    scala.io.Source.fromURL(url)
   }
 
   private def upload(stem: String, paths: Seq[Path]) {
@@ -70,16 +89,6 @@ class Client(val host : String, val port: Int,
     writer.close
   }
 
-  def add(path: Path) {
-    add(Seq(path))
-  }
-
-  def add(paths: Seq[Path]) {upload("/add", paths)}
-
-  def swarmPeers: SwarmPeers = getRequest("/swarm/peers", classOf[SwarmPeers])
-
-  def blockStat(key: String): BlockStat = getRequest("/block/stat", classOf[BlockStat], Seq("arg" -> key))
-
   lazy private val boundary = {
     val random = new Random()
     (0 to 32).map(_ => (0x41 + random.nextInt(26)).asInstanceOf[Char]).toArray.mkString
@@ -118,14 +127,10 @@ object Client {
     println(client.blockStat("QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"))
 
     val path = Paths.get("src", "main", "resources", "test.txt")
-    try {
-      val resp = client.add(path)
-      println("add response " +  resp)
-    } catch {
-      case t : Throwable => t.printStackTrace()
-    }
+    client.add(path)
 
-
+    val getIn : InputStream = client.getRequestInputStream("/get", Seq("arg" -> "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87", "encoding" -> "json"))
+    println(io.Source.fromInputStream(getIn).mkString)
   }
 
 }
