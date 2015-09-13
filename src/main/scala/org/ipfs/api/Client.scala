@@ -17,7 +17,7 @@ class Client(val host : String, val port: Int,
 
   def add(paths: Seq[Path]) = upload("/add", paths)
 
-  def ls(key:  String) =  getRequestSource("/ls", classOf[Ls], Seq("arg" -> key))
+  def ls(key:  String): Ls =  getRequestSource("/ls", classOf[Ls], Seq("arg" -> key))
 
 
 
