@@ -35,6 +35,10 @@ class Client(val host : String,
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
+  def objectGet(key: String) : ObjectGet = getRequestAsJson[ObjectGet]("/object/get", classOf[ObjectGet], toArgs(key))
+
+  def objectLinks(key: String): Object  = getRequestAsJson[Object]("/object/links", classOf[Object], toArgs(key))
+
   def ping(key: String) : Seq[Ping] = getRequestJsonSeq[Ping]("/ping", classOf[Ping], toArgs(key))
 
   def add(path: Path) {add(Seq(path))}
@@ -59,7 +63,7 @@ class Client(val host : String,
   jsonMapper.registerModule(DefaultScalaModule)
 
   private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
-    val url = Client.buildUrl(protocol, host, port, base, stem, query)
+    val url = buildUrl(protocol, host, port, base, stem, query)
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
   }
 
@@ -78,12 +82,12 @@ class Client(val host : String,
 
 
   private def getRequestSource(stem: String, query: Seq[(String, String)]) = {
-    val url = Client.buildUrl(protocol, host, port, base, stem, query)
+    val url = buildUrl(protocol, host, port, base, stem, query)
     scala.io.Source.fromURL(url)
   }
 
   private def upload(stem: String, paths: Seq[Path]) {
-    val url = Client.buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
+    val url = buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setDoOutput(true)
@@ -103,7 +107,7 @@ class Client(val host : String,
         "Content-Type: application/octet-stream",
         "Content-Transfer-Encoding: binary")
 
-      headers.foreach(writer.append(_).append(Client.LINE))
+      headers.foreach(writer.append(_).append(LINE))
       writer.flush()
 
       val in = new FileInputStream(path.toFile)
@@ -115,7 +119,7 @@ class Client(val host : String,
         } != -1)
           out.write(buffer, 0, nRead)
       } finally {
-        writer.append(Client.LINE)
+        writer.append(LINE)
         writer.flush
         in.close
       }
@@ -123,7 +127,7 @@ class Client(val host : String,
 
     paths.foreach(add)
 
-    Seq("--", boundary, "--", Client.LINE).foreach(writer.append(_))
+    Seq("--", boundary, "--", LINE).foreach(writer.append(_))
     writer.close
   }
 
@@ -139,6 +143,8 @@ case class BlockStat(Key: String, Size: Int)
 
 case class Link(Name: String,  Hash: String, Size: Int, Type: Int)
 case class Object(Hash: String, Links: Seq[Link])
+case class ObjectGet(Links:Seq[Link], Data: String)
+
 case class Ls(Objects: Seq[Object])
 
 case class Id(ID: String,  PublicKey: String,  Addresses: List[String], AgentVersion: String, ProtocolVersion: String)
@@ -188,7 +194,7 @@ case class Ping(Success: String, Time: Int, Text:  String)
 
 object Client {
 
-  class FullyReadableInputStream(in:  InputStream) {
+  class FullyReadableInputStream(in: InputStream) {
       def toArray : Array[Byte] = {
       val out = new ByteArrayOutputStream()
       try {
@@ -304,8 +310,16 @@ object Client {
     println(blockGet.length)
     sep()
 
-    val  objectData = client.getRequestInputStream("/object/data", toArgs(addedHash)).toArray
-    println(objectData.length )
+    val  objectData = client.objectData(addedHash).toArray
+    println(objectData.length)
+    sep()
+
+    val objectLinks =  client.objectLinks(addedHash)
+    println(objectLinks)
+    sep()
+
+    val objectGet = client.objectGet(addedHash)
+    println(objectGet)
     sep()
 
 
