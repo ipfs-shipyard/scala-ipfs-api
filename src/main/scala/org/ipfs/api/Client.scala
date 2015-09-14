@@ -4,10 +4,13 @@ import java.io._
 import java.net.{HttpURLConnection, URLEncoder, URL}
 import java.nio.file.{Paths, Path}
 
+import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import java.util.Random
+
+import scala.collection.mutable
 
 class Client(val host : String, val port: Int,
              val base: String = "/api/v0",
@@ -32,6 +35,7 @@ class Client(val host : String, val port: Int,
 
   def bootstrap : Bootstrap = getRequestAsJson("/bootstrap", classOf[Bootstrap])
 
+  def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
 
 
   private val jsonMapper = new ObjectMapper()
@@ -61,7 +65,7 @@ class Client(val host : String, val port: Int,
     conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary)
 
     val out = conn.getOutputStream
-        val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"))
+    val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"))
 
     val add = (path: Path) => {
       val fileName = path.getFileName.toString
@@ -114,6 +118,12 @@ case class Id(ID: String,  PublicKey: String,  Addresses: List[String], AgentVer
 
 case class Bootstrap(Peers: List[String])
 
+case class Addrs() {
+  val map = new mutable.HashMap[String, Seq[String]]()
+  @JsonAnySetter def set(key: String, addrs: Seq[String]) {map.put(key, addrs)}
+}
+case class SwarmAddrs(Addrs: Addrs)
+
 object Client {
 
   val LINE = "\r\n"
@@ -165,9 +175,11 @@ object Client {
     println(bootstrap)
     sep()
 
-    val swarmAddresses = client.getRequestSource("/swarm/addrs", Seq()).mkString
-    println(swarmAddresses)
-    sep()
+//    val swarmAddresses = client.getRequestSource("/swarm/addrs", Seq()).mkString
+//    println(swarmAddresses)
+    val swarmAddrs = client.swarmAdds
+    println(swarmAddrs.Addrs.map)
+//    sep()
 
 
   }
