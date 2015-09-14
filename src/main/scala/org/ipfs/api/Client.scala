@@ -37,7 +37,11 @@ class Client(val host : String, val port: Int,
 
   def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
 
+  def gc {getRequestSource("/repo/gc", Seq())}
 
+  def configShow : ConfigShow =  getRequestAsJson("/config/show", classOf[ConfigShow])
+
+  def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
   private val jsonMapper = new ObjectMapper()
   jsonMapper.registerModule(DefaultScalaModule)
 
@@ -124,6 +128,36 @@ case class Addrs() {
 }
 case class SwarmAddrs(Addrs: Addrs)
 
+
+case class Identity(PeerID: String,  PrivKey: String)
+case class Datastore(Type: String,  Path: String)
+case class Addresses(Swarm:  Seq[String], API: String,  Gateway:String)
+case class Mounts(IPFS: String,  IPNS: String,  FuseAllowOther: Boolean)
+case class Version(Current: String, Check: String, CheckDate: String,  CheckPeriod: String, AutoUpdate: String)
+case class MDNS(Enabled: Boolean, Interval: Int)
+case class Discovery(MDNS: MDNS)
+case class Tour(Last:String)
+case class Gateway(HTTPHeaders: String, RootRedirect: String, Writable: Boolean)
+case class SupernodeRouting(Servers: Seq[String])
+case class API(HTTPHeaders: String)
+case class Swarm(AddrFilters: String)
+case class Log(MaxSizeMB: Int, MaxBackups: Int, MaxAgeDays: Int)
+case class ConfigShow(Identity: Identity,
+                      Datastore: Datastore,
+                      Addresses: Addresses,
+                      Mounts: Mounts,
+                      Version: Version,
+                      Discovery: Discovery,
+                      Bootstrap: Seq[String],
+                      Tour: Tour,
+                      Gateway: Gateway,
+                      SupernodeRouting: SupernodeRouting,
+                      API: API,
+                      Swarm: Swarm,
+                      Log: Log)
+
+case class APIVersion(Version: String)
+
 object Client {
 
   val LINE = "\r\n"
@@ -146,21 +180,21 @@ object Client {
   def main(args: Array[String]) = {
 
     val client = new Client("localhost", 5001)
-//
-//    println(client.swarmPeers)
-//
-//    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
-//
-//    println(client.blockStat(addedHash))
-//
-//    println(client.ls(addedHash))
-//
-//    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
-//
-//    val path = Paths.get("src", "main", "resources", "test.txt")
-//    client.add(path)
+    //
+    //    println(client.swarmPeers)
+    //
+    //    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+    //
+    //    println(client.blockStat(addedHash))
+    //
+    //    println(client.ls(addedHash))
+    //
+    //    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
+    //
+    //    val path = Paths.get("src", "main", "resources", "test.txt")
+    //    client.add(path)
 
-//    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
+    //    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
 
     val sep = () => println("*"*50)
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
@@ -175,12 +209,23 @@ object Client {
     println(bootstrap)
     sep()
 
-//    val swarmAddresses = client.getRequestSource("/swarm/addrs", Seq()).mkString
-//    println(swarmAddresses)
     val swarmAddrs = client.swarmAdds
     println(swarmAddrs.Addrs.map)
-//    sep()
+    sep()
 
+    val gc = client.gc
+    println(gc)
+    sep()
+
+//    val configShow = client.getRequestSource("/config/show", Seq()).mkString
+    val configShow = client.configShow
+    println(configShow)
+    sep()
+
+//        val version = client.getRequestSource("/version", Seq()).mkString
+    val version = client.version
+    println(version)
+    sep()
 
   }
 
