@@ -28,6 +28,7 @@ class Client(val host : String,
 
   def refs(key: String): Seq[Ref] = getRequestJsonSeq("/refs", classOf[Ref], toArgs(key))
 
+  def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
 
 
   //TODO  blockPut, objectPut,  objectPatch
@@ -251,6 +252,9 @@ object Client {
     println(io.Source.fromInputStream(cat).mkString)
     sep()
 
+    val get: InputStream = client.get(addedHash)
+    println(io.Source.fromInputStream(get).mkString)
+    sep()
 
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
     println(pinls)
