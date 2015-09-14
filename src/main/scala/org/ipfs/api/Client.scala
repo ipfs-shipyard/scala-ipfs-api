@@ -6,7 +6,7 @@ import java.nio.file.{Paths, Path}
 import collection.JavaConverters._
 
 import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.databind.{MappingIterator, ObjectMapper}
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import java.util.Random
@@ -28,6 +28,10 @@ class Client(val host : String,
 
 
 
+  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  Seq("arg" -> key))
+
+  def ping(key: String) : Seq[Ping] = getRequestJsonSeq[Ping]("/ping", classOf[Ping], Seq("arg" -> key))
+
   def add(path: Path) {add(Seq(path))}
 
   def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
@@ -45,6 +49,7 @@ class Client(val host : String,
   def configShow : ConfigShow =  getRequestAsJson("/config/show", classOf[ConfigShow])
 
   def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
+
   private val jsonMapper = new ObjectMapper()
   jsonMapper.registerModule(DefaultScalaModule)
 
@@ -57,10 +62,10 @@ class Client(val host : String,
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
   private def getRequestJsonSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
-    //necessary for a few IPFS API calls appear to return  a concatenated sequence of  json docs instead of a
+    //necessary for a few IPFS API calls that  return a concatenated sequence of json docs instead of a
     //valid JSON doc
     jsonMapper.reader(clazz)
-      .readValues(getRequestSource(stem, query).mkString)
+      .readValues(getRequestSource(stem, query).reader())
       .readAll()
       .asScala
 
@@ -106,7 +111,7 @@ class Client(val host : String,
           out.write(buffer, 0, nRead)
       } finally {
         writer.append(Client.LINE)
-        out.flush
+        writer.flush
         in.close
       }
     }
@@ -173,6 +178,8 @@ case class APIVersion(Version: String)
 
 case class Ref(Ref: String, Err: String)
 
+case class Ping(Success: String, Time: Int, Text:  String)
+
 
 object Client {
 
@@ -199,6 +206,7 @@ object Client {
     //
     //    println(client.swarmPeers)
     //
+
         val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
 
     //
@@ -256,18 +264,24 @@ object Client {
     println(swarmPeers)
     sep()
 
-//    val refs = client.getRequestSource("/refs", Seq("arg" -> addedHash)).mkString
-    val refs = client.refs(addedHash)
-    println(refs)
-    sep()
+//    val refs = client.refs(addedHash)
+//    println(refs)
+//    sep()
 
-//    val ping = client.getRequestSource("/ping", Seq("arg" ->  addedHash)).mkString
+//    val ping = client.ping(addedHash)
 //    println(ping)
 //    sep()
 
-//    val mapper = new ObjectMapper();
-//    mapper.registerModule(DefaultScalaModule)
-    
+    val blockGet =  client.blockGet(addedHash)
+    val out = new ByteArrayOutputStream()
+    val buff  = new Array[Byte](0x1000)
+    var nRead =0
+    while ({nRead = blockGet.read(buff);  nRead} != -1)
+      out.write(buff, 0, nRead)
+    println(out.toByteArray.length)
+
+    sep()
+
   }
 
 }
