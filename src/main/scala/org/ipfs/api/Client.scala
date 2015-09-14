@@ -3,25 +3,28 @@ package org.ipfs.api
 import java.io._
 import java.net.{HttpURLConnection, URLEncoder, URL}
 import java.nio.file.{Paths, Path}
+import collection.JavaConverters._
 
 import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{MappingIterator, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import java.util.Random
 
 import scala.collection.mutable
 
-class Client(val host : String, val port: Int,
+class Client(val host : String,
+             val port: Int = 5001,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
-  def get(key: String) : InputStream = getRequestInputStream("/get", Seq("arg" -> key))
+  def cat(key: String) : InputStream = getRequestInputStream("/cat", Seq("arg" -> key))
 
   def add(paths: Seq[Path]) = upload("/add", paths)
 
   def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], Seq("arg" -> key))
 
+  def refs(key: String): Seq[Ref] = getRequestJsonSeq[Ref]("/refs", classOf[Ref], Seq("arg" -> key))
 
 
 
@@ -53,6 +56,16 @@ class Client(val host : String, val port: Int,
   private def getRequestAsJson[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
+  private def getRequestJsonSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
+    //necessary for a few IPFS API calls appear to return  a concatenated sequence of  json docs instead of a
+    //valid JSON doc
+    jsonMapper.reader(clazz)
+      .readValues(getRequestSource(stem, query).mkString)
+      .readAll()
+      .asScala
+
+  }
+
 
   private def getRequestSource(stem: String, query: Seq[(String, String)]) = {
     val url = Client.buildUrl(protocol, host, port, base, stem, query)
@@ -158,6 +171,9 @@ case class ConfigShow(Identity: Identity,
 
 case class APIVersion(Version: String)
 
+case class Ref(Ref: String, Err: String)
+
+
 object Client {
 
   val LINE = "\r\n"
@@ -179,17 +195,17 @@ object Client {
 
   def main(args: Array[String]) = {
 
-    val client = new Client("localhost", 5001)
+    val client = new Client("localhost")
     //
     //    println(client.swarmPeers)
     //
-    //    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+        val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+
     //
     //    println(client.blockStat(addedHash))
     //
     //    println(client.ls(addedHash))
     //
-    //    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
     //
     //    val path = Paths.get("src", "main", "resources", "test.txt")
     //    client.add(path)
@@ -197,6 +213,13 @@ object Client {
     //    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
 
     val sep = () => println("*"*50)
+
+    val cat: InputStream = client.cat(addedHash)
+    println(io.Source.fromInputStream(cat).mkString)
+
+    sep()
+
+
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
     println(pinls)
     sep()
@@ -217,16 +240,34 @@ object Client {
     println(gc)
     sep()
 
-//    val configShow = client.getRequestSource("/config/show", Seq()).mkString
     val configShow = client.configShow
     println(configShow)
     sep()
 
-//        val version = client.getRequestSource("/version", Seq()).mkString
     val version = client.version
     println(version)
     sep()
 
+    val ls = client.ls(addedHash)
+    println(ls)
+    sep()
+
+    val swarmPeers = client.swarmPeers
+    println(swarmPeers)
+    sep()
+
+//    val refs = client.getRequestSource("/refs", Seq("arg" -> addedHash)).mkString
+    val refs = client.refs(addedHash)
+    println(refs)
+    sep()
+
+//    val ping = client.getRequestSource("/ping", Seq("arg" ->  addedHash)).mkString
+//    println(ping)
+//    sep()
+
+//    val mapper = new ObjectMapper();
+//    mapper.registerModule(DefaultScalaModule)
+    
   }
 
 }
