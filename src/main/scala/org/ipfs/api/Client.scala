@@ -20,6 +20,10 @@ class Client(val host : String,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
+  //
+  //basic commands
+  //
+
   def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
 
   def add(paths: Seq[Path]) = upload("/add", paths)
@@ -30,9 +34,17 @@ class Client(val host : String,
 
   def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
 
+  def add(path: Path) {add(Seq(path))}
 
+
+  //
+  //data structure commands
+  //
   //TODO  blockPut, objectPut,  objectPatch
+
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
+
+  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], toArgs(key))
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
@@ -42,25 +54,29 @@ class Client(val host : String,
 
   def objectLinks(key: String): Object  = getRequestAsJson("/object/links", classOf[Object], toArgs(key))
 
-  def ping(key: String) : Seq[Ping] = getRequestJsonSeq("/ping", classOf[Ping], toArgs(key))
-
-  def add(path: Path) {add(Seq(path))}
-
-  def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
-
-  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], toArgs(key))
+  //
+  //network  commands
+  //
 
   def id : Id = getRequestAsJson("/id", classOf[Id])
 
   def bootstrap : Bootstrap = getRequestAsJson("/bootstrap", classOf[Bootstrap])
 
+  def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
+
   def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
 
+  def ping(key: String) : Seq[Ping] = getRequestJsonSeq("/ping", classOf[Ping], toArgs(key))
+
+  //
+  //tool commands
+  //
   def gc {getRequestSource("/repo/gc", Seq())}
 
   def configShow : ConfigShow =  getRequestAsJson("/config/show", classOf[ConfigShow])
 
   def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
+
 
   private val jsonMapper = new ObjectMapper()
   jsonMapper.registerModule(DefaultScalaModule)
@@ -81,7 +97,6 @@ class Client(val host : String,
       .readAll()
       .asScala
   }
-
 
   private def getRequestSource(stem: String, query: Seq[(String, String)]) = {
     val url = buildUrl(protocol, host, port, base, stem, query)
