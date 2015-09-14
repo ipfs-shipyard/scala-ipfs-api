@@ -17,16 +17,20 @@ class Client(val host : String, val port: Int,
 
   def add(paths: Seq[Path]) = upload("/add", paths)
 
-  def ls(key:  String): Ls =  getRequestSource("/ls", classOf[Ls], Seq("arg" -> key))
+  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], Seq("arg" -> key))
 
 
 
 
   def add(path: Path) {add(Seq(path))}
 
-  def swarmPeers: SwarmPeers = getRequestSource("/swarm/peers", classOf[SwarmPeers])
+  def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
 
-  def blockStat(key: String): BlockStat = getRequestSource("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+
+  def id : Id = getRequestAsJson("/id", classOf[Id])
+
+  def bootstrap : Bootstrap = getRequestAsJson("/bootstrap", classOf[Bootstrap])
 
 
 
@@ -38,7 +42,7 @@ class Client(val host : String, val port: Int,
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
   }
 
-  private def getRequestSource[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
+  private def getRequestAsJson[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
 
@@ -106,6 +110,10 @@ case class Link(Name: String,  Hash: String, Size: Int, Type: Int)
 case class Object(Hash: String, Links: Seq[Link])
 case class Ls(Objects: Seq[Object])
 
+case class Id(ID: String,  PublicKey: String,  Addresses: List[String], AgentVersion: String, ProtocolVersion: String)
+
+case class Bootstrap(Peers: List[String])
+
 object Client {
 
   val LINE = "\r\n"
@@ -128,21 +136,39 @@ object Client {
   def main(args: Array[String]) = {
 
     val client = new Client("localhost", 5001)
+//
+//    println(client.swarmPeers)
+//
+//    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+//
+//    println(client.blockStat(addedHash))
+//
+//    println(client.ls(addedHash))
+//
+//    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
+//
+//    val path = Paths.get("src", "main", "resources", "test.txt")
+//    client.add(path)
 
-    println(client.swarmPeers)
+//    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
 
-    val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
+    val sep = () => println("*"*50)
+    val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
+    println(pinls)
+    sep()
 
-    println(client.blockStat(addedHash))
+    val  id =  client.id
+    println(id)
+    sep()
 
-    println(client.ls(addedHash))
+    val  bootstrap =  client.bootstrap
+    println(bootstrap)
+    sep()
 
-    println(io.Source.fromInputStream(client.get(addedHash)).mkString)
+    val swarmAddresses = client.getRequestSource("/swarm/addrs", Seq()).mkString
+    println(swarmAddresses)
+    sep()
 
-    val path = Paths.get("src", "main", "resources", "test.txt")
-    client.add(path)
-
-    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
 
   }
 
