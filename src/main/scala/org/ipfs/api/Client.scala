@@ -26,11 +26,11 @@ class Client(val host : String,
 
   def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
 
-  def refs(key: String): Seq[Ref] = getRequestJsonSeq[Ref]("/refs", classOf[Ref], toArgs(key))
+  def refs(key: String): Seq[Ref] = getRequestJsonSeq("/refs", classOf[Ref], toArgs(key))
 
 
 
-  //TODO  blockPut, objectPut
+  //TODO  blockPut, objectPut,  objectPatch
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
@@ -79,7 +79,6 @@ class Client(val host : String,
       .readValues(getRequestSource(stem, query).reader())
       .readAll()
       .asScala
-
   }
 
 
@@ -195,10 +194,11 @@ case class Ref(Ref: String, Err: String)
 case class Ping(Success: String, Time: Int, Text:  String)
 
 
+
 object Client {
 
   class FullyReadableInputStream(in: InputStream) {
-      def toArray : Array[Byte] = {
+    def toArray : Array[Byte] = {
       val out = new ByteArrayOutputStream()
       try {
         val buff  = new Array[Byte](0x1000)
@@ -236,28 +236,19 @@ object Client {
   def main(args: Array[String]) = {
 
     val client = new Client("localhost")
-    //
-    //    println(client.swarmPeers)
-    //
 
-        val addedHash = "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
 
-    //
-    //    println(client.blockStat(addedHash))
-    //
-    //    println(client.ls(addedHash))
-    //
-    //
-    //    val path = Paths.get("src", "main", "resources", "test.txt")
-    //    client.add(path)
+    val addedHash = if(args.length > 0) args(0) else "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
 
-    //    println(client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString)
+
+    val path = Paths.get("src", "main", "resources", "test.txt")
+    client.add(path)
+
 
     val sep = () => println("*"*50)
 
     val cat: InputStream = client.cat(addedHash)
     println(io.Source.fromInputStream(cat).mkString)
-
     sep()
 
 
@@ -297,17 +288,6 @@ object Client {
     println(swarmPeers)
     sep()
 
-//    val refs = client.refs(addedHash)
-//    println(refs)
-//    sep()
-
-//    val ping = client.ping(addedHash)
-//    println(ping)
-//    sep()
-
-
-
-
     val blockGet =  client.blockGet(addedHash).toArray
 
     println(blockGet.length)
@@ -325,10 +305,13 @@ object Client {
     println(objectGet)
     sep()
 
-//    val objectStat = client.getRequestSource("/object/stat", toArgs(addedHash)).mkString
     val objectStat = client.objectStat(addedHash)
     println(objectStat)
     sep()
+
+//    val fileLs = client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString
+//    println(fileLs)
+//    sep()
 
   }
 
