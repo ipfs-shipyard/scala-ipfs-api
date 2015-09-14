@@ -30,16 +30,18 @@ class Client(val host : String,
 
 
 
-  //TODO  blockPut
+  //TODO  blockPut, objectPut
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
-  def objectGet(key: String) : ObjectGet = getRequestAsJson[ObjectGet]("/object/get", classOf[ObjectGet], toArgs(key))
+  def objectGet(key: String) : ObjectGet = getRequestAsJson("/object/get", classOf[ObjectGet], toArgs(key))
 
-  def objectLinks(key: String): Object  = getRequestAsJson[Object]("/object/links", classOf[Object], toArgs(key))
+  def objectStat(key: String) : ObjectStat = getRequestAsJson("/object/stat", classOf[ObjectStat], toArgs(key))
 
-  def ping(key: String) : Seq[Ping] = getRequestJsonSeq[Ping]("/ping", classOf[Ping], toArgs(key))
+  def objectLinks(key: String): Object  = getRequestAsJson("/object/links", classOf[Object], toArgs(key))
+
+  def ping(key: String) : Seq[Ping] = getRequestJsonSeq("/ping", classOf[Ping], toArgs(key))
 
   def add(path: Path) {add(Seq(path))}
 
@@ -144,6 +146,7 @@ case class BlockStat(Key: String, Size: Int)
 case class Link(Name: String,  Hash: String, Size: Int, Type: Int)
 case class Object(Hash: String, Links: Seq[Link])
 case class ObjectGet(Links:Seq[Link], Data: String)
+case class ObjectStat(Hash: String, NumLinks: Int,  BlockSize: Int, LinksSize: Int,  DataSize: Int,  CumulativeSize: Int)
 
 case class Ls(Objects: Seq[Object])
 
@@ -322,8 +325,10 @@ object Client {
     println(objectGet)
     sep()
 
-
-
+//    val objectStat = client.getRequestSource("/object/stat", toArgs(addedHash)).mkString
+    val objectStat = client.objectStat(addedHash)
+    println(objectStat)
+    sep()
 
   }
 
