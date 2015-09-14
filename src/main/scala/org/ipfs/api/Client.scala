@@ -13,30 +13,35 @@ import java.util.Random
 
 import scala.collection.mutable
 
+import Client._
+
 class Client(val host : String,
              val port: Int = 5001,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
-  def cat(key: String) : InputStream = getRequestInputStream("/cat", Seq("arg" -> key))
+  def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
 
   def add(paths: Seq[Path]) = upload("/add", paths)
 
-  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], Seq("arg" -> key))
+  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
 
-  def refs(key: String): Seq[Ref] = getRequestJsonSeq[Ref]("/refs", classOf[Ref], Seq("arg" -> key))
+  def refs(key: String): Seq[Ref] = getRequestJsonSeq[Ref]("/refs", classOf[Ref], toArgs(key))
 
 
 
-  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  Seq("arg" -> key))
+  //TODO  blockPut
+  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
-  def ping(key: String) : Seq[Ping] = getRequestJsonSeq[Ping]("/ping", classOf[Ping], Seq("arg" -> key))
+  def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
+
+  def ping(key: String) : Seq[Ping] = getRequestJsonSeq[Ping]("/ping", classOf[Ping], toArgs(key))
 
   def add(path: Path) {add(Seq(path))}
 
   def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
 
-  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], Seq("arg" -> key))
+  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], toArgs(key))
 
   def id : Id = getRequestAsJson("/id", classOf[Id])
 
@@ -183,7 +188,26 @@ case class Ping(Success: String, Time: Int, Text:  String)
 
 object Client {
 
+  class FullyReadableInputStream(in:  InputStream) {
+      def toArray : Array[Byte] = {
+      val out = new ByteArrayOutputStream()
+      try {
+        val buff  = new Array[Byte](0x1000)
+        var nRead = 0
+        while ( {nRead = in.read(buff);nRead} != -1)
+          out.write(buff, 0, nRead)
+      } finally {
+        in.close
+      }
+      out.toByteArray
+    }
+  }
+
+  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
+
   val LINE = "\r\n"
+
+  def toArgs(key: String) = Seq("arg" -> key)
 
   def buildUrl(protocol: String,
                host: String,
@@ -272,15 +296,20 @@ object Client {
 //    println(ping)
 //    sep()
 
-    val blockGet =  client.blockGet(addedHash)
-    val out = new ByteArrayOutputStream()
-    val buff  = new Array[Byte](0x1000)
-    var nRead =0
-    while ({nRead = blockGet.read(buff);  nRead} != -1)
-      out.write(buff, 0, nRead)
-    println(out.toByteArray.length)
 
+
+
+    val blockGet =  client.blockGet(addedHash).toArray
+
+    println(blockGet.length)
     sep()
+
+    val  objectData = client.getRequestInputStream("/object/data", toArgs(addedHash)).toArray
+    println(objectData.length )
+    sep()
+
+
+
 
   }
 
