@@ -15,6 +15,8 @@ import scala.collection.mutable
 
 import Client._
 
+import scala.io.BufferedSource
+
 class Client(val host : String,
              val port: Int = 5001,
              val base: String = "/api/v0",
@@ -26,7 +28,7 @@ class Client(val host : String,
 
   def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
 
-  def add(paths: Seq[Path]) = upload("/add", paths)
+  def add(path: Path) : Add = jsonMapper.readValue(upload("/add", path).reader(), classOf[Add])
 
   def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
 
@@ -34,7 +36,6 @@ class Client(val host : String,
 
   def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
 
-  def add(path: Path) {add(Seq(path))}
 
 
   //
@@ -103,29 +104,31 @@ class Client(val host : String,
     scala.io.Source.fromURL(url)
   }
 
-  private def upload(stem: String, paths: Seq[Path]) {
+  private def upload(stem: String, path: Path)  : BufferedSource = {
     val url = buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setDoOutput(true)
     conn.setDoInput(true)
+    conn.setUseCaches(false)
     conn.setRequestMethod("POST")
     conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary)
+    conn.setRequestProperty("User-Agent", "Scala IPFS Client")
 
     val out = conn.getOutputStream
-    val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"))
+    val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true)
 
     val add = (path: Path) => {
       val fileName = path.getFileName.toString
 
       val headers: Seq[String] = Seq(
         "--" + boundary,
-        "Content-Disposition: file; name=\"file\"; filename=\"" + fileName + "\"",
+        "Content-Disposition: file; name=\""+fileName+"\"; filename=\""+ fileName+"\"",
         "Content-Type: application/octet-stream",
         "Content-Transfer-Encoding: binary")
 
       headers.foreach(writer.append(_).append(LINE))
-      writer.flush()
+      writer.append(LINE)
 
       val in = new FileInputStream(path.toFile)
       try {
@@ -137,15 +140,17 @@ class Client(val host : String,
           out.write(buffer, 0, nRead)
       } finally {
         writer.append(LINE)
-        writer.flush
         in.close
       }
     }
 
-    paths.foreach(add)
+    add(path)
 
     Seq("--", boundary, "--", LINE).foreach(writer.append(_))
     writer.close
+
+
+    io.Source.fromInputStream(conn.getInputStream)
   }
 
   lazy private val boundary = {
@@ -153,6 +158,8 @@ class Client(val host : String,
     (0 to 32).map(_ => (0x41 + random.nextInt(26)).asInstanceOf[Char]).toArray.mkString
   }
 }
+
+case class Add(Name: String, Hash: String)
 
 case class SwarmPeers(Strings: List[String])
 
@@ -257,18 +264,19 @@ object Client {
     val addedHash = if(args.length > 0) args(0) else "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
 
 
-    val path = Paths.get("src", "main", "resources", "test.txt")
-    client.add(path)
-
-
     val sep = () => println("*"*50)
 
+    val path= Paths.get("src", "main", "resources", "test.4.txt")
+    val add = client.add(path)
+    println(add)
+    sep()
+
     val cat: InputStream = client.cat(addedHash)
-    println(io.Source.fromInputStream(cat).mkString)
+//    println(io.Source.fromInputStream(cat).mkString)
     sep()
 
     val get: InputStream = client.get(addedHash)
-    println(io.Source.fromInputStream(get).mkString)
+//    println(io.Source.fromInputStream(get).mkString)
     sep()
 
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
@@ -328,9 +336,9 @@ object Client {
     println(objectStat)
     sep()
 
-//    val fileLs = client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString
-//    println(fileLs)
-//    sep()
+    val fileLs = client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString
+    println(fileLs)
+    sep()
 
   }
 
