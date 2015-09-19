@@ -23,7 +23,7 @@ class Client(val host : String,
              val protocol: String = "http") {
 
   //TODO
-  //pin,  mount
+  //mount
 
   //
   //
@@ -84,6 +84,17 @@ class Client(val host : String,
 
   def id : Id = getRequestAsType("/id", classOf[Id])
 
+  def lsPins : JsonNode = getRequestAsJson("/pin/ls", Seq()).get("Keys")
+
+  def addPin(key: String) : Seq[String] = getRequestAsJson("/pin/add", toArgs(key)).get("Pinned")
+    .asScala
+    .toArray
+    .map(_.toString)
+
+  def removePin(key: String) : Seq[String] = getRequestAsJson("/pin/rm", toArgs(key)).get("Pinned")
+    .asScala
+    .toArray
+    .map(_.toString)
   //
   //network  commands
   //
@@ -346,9 +357,6 @@ object Client {
     println(io.Source.fromInputStream(get).mkString)
     sep()
 
-    val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
-    println(pinls)
-    sep()
 
     val  id =  client.id
     println(id)
@@ -432,6 +440,20 @@ object Client {
 
     val dns = client.dnsResolve("ipfs.io")
     println(dns)
+    sep()
+
+    val pinAdd = client.addPin(addedHash)
+    println(pinAdd)
+    sep()
+
+    val pins:  JsonNode = client.lsPins
+    println(pins)
+    sep()
+
+//    val pinRm: Seq[String] = client.getRequestAsJson("/pin/rm", toArgs(addedHash)).get("Pinned").asScala.toArray.map(_.asText())
+    val pinRm  = client.removePin(addedHash)
+    println(pinRm)
+    sep()
   }
 
 }
