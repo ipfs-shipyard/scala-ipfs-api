@@ -82,8 +82,9 @@ class Client(val host : String,
 
   def publish(key: String) : Publish = getRequestAsJson("/name/publish", classOf[Publish], Seq("arg" -> key))
 
-  def dhtPut(key: String, value: String) : Seq[DHTPut] =  getRequestAsJsonSeq("/dht/put", classOf[DHTPut], Seq("arg" -> key, "arg" -> value))
+  def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsJsonSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
 
+  def dhtGet(key: String) : DHTResponse = getRequestAsJson("/dht/get", classOf[DHTResponse], toArgs(key))
   //
   //network  commands
   //
@@ -249,8 +250,8 @@ case class Objects() {
 }
 case class FileLs(Arguments: Arguments, Objects: Objects)
 
-case class DHTPutResponse(Addrs: Seq[String],  ID: String)
-case class DHTPut(Extra: String, ID: String, Responses: Seq[DHTPutResponse], Type: Int)
+case class DHTResponseAddrs(Addrs: Seq[String],  ID: String)
+case class DHTResponse(Extra: String, ID: String, Responses: Seq[DHTResponseAddrs], Type: Int)
 
 object Client {
   private val jsonMapper = new ObjectMapper()
@@ -405,8 +406,13 @@ object Client {
     println(publish)
     sep()
 
-    val  dhtput  = client.dhtPut("ckey3", "cval3")
+    val dhtKey: String = "ckey3"
+    val  dhtput  = client.dhtPut(dhtKey, "cval3")
     println(dhtput)
+    sep()
+
+    val dhtGet = client.dhtGet(dhtKey)
+    println(dhtGet)
     sep()
 
   }
