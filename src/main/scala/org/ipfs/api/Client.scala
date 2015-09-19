@@ -30,6 +30,8 @@ class Client(val host : String,
   //basic commands
   //
 
+  def buildUrl(stem: String, query: Seq[(String, String)]) : URL = Client.buildUrl(protocol, host, port, base, stem, query)
+
   def add(paths: Seq[Path]) : Seq[Add] = jsonMapper.reader(classOf[Add])
     .readValues(upload("/add", paths).reader())
     .readAll()
@@ -80,7 +82,8 @@ class Client(val host : String,
 
   def publish(key: String) : Publish = getRequestAsJson("/name/publish", classOf[Publish], Seq("arg" -> key))
 
-  //
+  def dhtPut(key: String, value: String) : Seq[DHTPut] =  getRequestAsJsonSeq("/dht/put", classOf[DHTPut], Seq("arg" -> key, "arg" -> value))
+
   //
   //network  commands
   //
@@ -104,7 +107,7 @@ class Client(val host : String,
   def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
 
   private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
-    val url = buildUrl(protocol, host, port, base, stem, query)
+    val url = buildUrl(stem, query)
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
   }
 
@@ -121,12 +124,12 @@ class Client(val host : String,
   }
 
   private def getRequestSource(stem: String, query: Seq[(String, String)]) = {
-    val url = buildUrl(protocol, host, port, base, stem, query)
+    val url = buildUrl(stem, query)
     scala.io.Source.fromURL(url)
   }
 
   private def upload(stem: String, namedInputStreams: Seq[(String, InputStream)])  : BufferedSource = {
-    val url = buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
+    val url = buildUrl(stem, Seq("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setDoOutput(true)
@@ -246,6 +249,8 @@ case class Objects() {
 }
 case class FileLs(Arguments: Arguments, Objects: Objects)
 
+case class DHTPutResponse(Addrs: Seq[String],  ID: String)
+case class DHTPut(Extra: String, ID: String, Responses: Seq[DHTPutResponse], Type: Int)
 
 object Client {
   private val jsonMapper = new ObjectMapper()
@@ -302,7 +307,6 @@ object Client {
     val client = new Client("localhost")
 
     val sep = () => println("*"*50)
-
 
 
     val paths = Seq("build.sbt", "README.md").map(Paths.get(_))
@@ -399,6 +403,10 @@ object Client {
 
     val publish = client.publish(addedHash)
     println(publish)
+    sep()
+
+    val  dhtput  = client.dhtPut("ckey3", "cval3")
+    println(dhtput)
     sep()
 
   }
