@@ -46,7 +46,7 @@ class Client(val host : String,
   //
   //data structure commands
   //
-  //TODO  blockPut, objectPut,  objectPatch
+  //TODO  objectPatch
 
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
@@ -61,6 +61,11 @@ class Client(val host : String,
   def objectStat(key: String) : ObjectStat = getRequestAsJson("/object/stat", classOf[ObjectStat], toArgs(key))
 
   def objectLinks(key: String): Object  = getRequestAsJson("/object/links", classOf[Object], toArgs(key))
+
+  def objectPut(path: Path) :  Object = {
+    val paths : Seq[Path] = Seq(path)
+    jsonMapper.readValue(upload("/object/put", paths).reader(), classOf[Object])
+  }
 
   //
   //network  commands
@@ -358,6 +363,12 @@ object Client {
     val head = Paths.get("/","home", "chrirs", "camping.md")
     val blockPut = client.blockPut(head.getFileName.toString, new FileInputStream(head.toFile))
     println(blockPut.mkString)
+    sep()
+
+    val objectPutPath: Path = Paths.get("/", "home", "chrirs", "node.json")
+    val objectPut  = client.objectPut(objectPutPath)
+    println(objectPut)
+    sep()
 
   }
 
