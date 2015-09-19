@@ -6,7 +6,7 @@ import java.nio.file.{Paths, Path}
 import collection.JavaConverters._
 
 import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import java.util.Random
@@ -85,6 +85,11 @@ class Client(val host : String,
   def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsJsonSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
 
   def dhtGet(key: String) : DHTResponse = getRequestAsJson("/dht/get", classOf[DHTResponse], toArgs(key))
+
+  def dhtFindProvs(key: String) : JsonNode = getRequestAsGenericJson("/dht/findprovs", toArgs(key))
+
+  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/findpeers", toArgs(peerId))
+
   //
   //network  commands
   //
@@ -128,6 +133,8 @@ class Client(val host : String,
     val url = buildUrl(stem, query)
     scala.io.Source.fromURL(url)
   }
+
+  private def getRequestAsGenericJson(stem: String, query : Seq[(String, String)]) : JsonNode = jsonMapper.readTree(getRequestSource(stem, query).reader())
 
   private def upload(stem: String, namedInputStreams: Seq[(String, InputStream)])  : BufferedSource = {
     val url = buildUrl(stem, Seq("stream-channels" -> "true"))
@@ -275,7 +282,7 @@ object Client {
     }
   }
 
-  def toArgs(key: String) = Seq("arg" -> key)
+  def toArgs(key: String*) : Seq[(String, String)] = key.map(("arg" -> _))
 
   def urlEncode(s: String) = URLEncoder.encode(s, "UTF-8")
 
@@ -414,7 +421,6 @@ object Client {
     val dhtGet = client.dhtGet(dhtKey)
     println(dhtGet)
     sep()
-
   }
 
 }
