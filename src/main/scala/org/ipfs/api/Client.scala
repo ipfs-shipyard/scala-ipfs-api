@@ -28,7 +28,12 @@ class Client(val host : String,
 
   def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
 
-  def add(path: Path) : Add = jsonMapper.readValue(upload("/add", path).reader(), classOf[Add])
+  def add(paths: Seq[Path]) : Seq[Add] = jsonMapper.reader(classOf[Add])
+                                      .readValues(upload("/add", paths).reader())
+                                      .readAll()
+                                      .asScala
+
+  def addTree(path: Path) = add(walkTree(path))
 
   def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
 
@@ -104,7 +109,7 @@ class Client(val host : String,
     scala.io.Source.fromURL(url)
   }
 
-  private def upload(stem: String, path: Path)  : BufferedSource = {
+  private def upload(stem: String, paths: Seq[Path])  : BufferedSource = {
     val url = buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
@@ -144,7 +149,7 @@ class Client(val host : String,
       }
     }
 
-    add(path)
+    paths.foreach(add(_))
 
     Seq("--", boundary, "--", LINE).foreach(writer.append(_))
     writer.close
@@ -241,6 +246,18 @@ object Client {
 
   def toArgs(key: String) = Seq("arg" -> key)
 
+  def urlEncode(s: String) = URLEncoder.encode(s, "UTF-8")
+
+  implicit def pathToFile(path: Path) = path.toFile
+
+  def walkTree(path: Path) : Seq[Path]  = path match {
+    case _ if path.isFile => Seq(path)
+    case _ if path.isDirectory => path.listFiles().flatMap(f => walkTree(f.toPath))
+    case _ => Seq()
+  }
+
+
+
   def buildUrl(protocol: String,
                host: String,
                port: Int,
@@ -248,7 +265,7 @@ object Client {
                stem: String,
                query : Seq[(String, String)]) = {
 
-    val queryStem = query.map(e => URLEncoder.encode(e._1, "UTF-8")  +"="+ URLEncoder.encode(e._2, "UTF-8"))
+    val queryStem = query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2))
       .foldLeft(new StringBuilder("?"))((builder, entry) => builder.append("&").append(entry))
       .toString
 
@@ -260,23 +277,22 @@ object Client {
 
     val client = new Client("localhost")
 
-
     val addedHash = if(args.length > 0) args(0) else "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
-
 
     val sep = () => println("*"*50)
 
-    val path= Paths.get("src", "main", "resources", "test.4.txt")
-    val add = client.add(path)
+    val paths = Seq("build.sbt", "README.md").map(Paths.get(_))
+    val add = client.add(paths)
     println(add)
+
     sep()
 
     val cat: InputStream = client.cat(addedHash)
-//    println(io.Source.fromInputStream(cat).mkString)
+    //    println(io.Source.fromInputStream(cat).mkString)
     sep()
 
     val get: InputStream = client.get(addedHash)
-//    println(io.Source.fromInputStream(get).mkString)
+    //    println(io.Source.fromInputStream(get).mkString)
     sep()
 
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
