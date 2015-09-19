@@ -22,6 +22,10 @@ class Client(val host : String,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
+  //TODO
+  //name, resolve, dns,  pin,  dht
+
+  //
   //
   //basic commands
   //
@@ -41,12 +45,9 @@ class Client(val host : String,
 
   def refs(key: String): Seq[Ref] = getRequestAsJsonSeq("/refs", classOf[Ref], toArgs(key))
 
-
-
   //
   //data structure commands
   //
-  //TODO  objectPatch
 
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
@@ -67,10 +68,16 @@ class Client(val host : String,
     jsonMapper.readValue(upload("/object/put", paths).reader(), classOf[Object])
   }
 
-  //
-  //data structure  commands
-
   def fileLs(key: String) : FileLs = getRequestAsJson("/file/ls", classOf[FileLs], Seq("arg" -> key))
+
+  //
+  //advanced commands
+  //
+
+  def gc {getRequestSource("/repo/gc", Seq())}
+
+  def resolve(key: String)  : Resolve =  getRequestAsJson("/name/resolve", classOf[Resolve], Seq("arg" -> key))
+
 
   //
   //
@@ -90,7 +97,6 @@ class Client(val host : String,
   //
   //tool commands
   //
-  def gc {getRequestSource("/repo/gc", Seq())}
 
   def configShow : ConfigShow =  getRequestAsJson("/config/show", classOf[ConfigShow])
 
@@ -194,7 +200,7 @@ case class Addrs() {
 }
 case class SwarmAddrs(Addrs: Addrs)
 
-
+case class Resolve(Path: String)
 case class Identity(PeerID: String,  PrivKey: String)
 case class Datastore(Type: String,  Path: String)
 case class Addresses(Swarm:  Seq[String], API: String,  Gateway:String)
@@ -284,10 +290,7 @@ object Client {
                stem: String,
                query : Seq[(String, String)]) = {
 
-    val queryStem = query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2))
-      .foldLeft(new StringBuilder("?"))((builder, entry) => builder.append("&").append(entry))
-      .toString
-
+    val queryStem = "?" + query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2)).reduce((a,b) =>  a+"&"+b)
     val path = base + stem + queryStem
     new URL(protocol, host, port, path)
   }
@@ -298,6 +301,8 @@ object Client {
 
     val sep = () => println("*"*50)
 
+
+
     val paths = Seq("build.sbt", "README.md").map(Paths.get(_))
     val add = client.add(paths)
     println(add)
@@ -305,6 +310,19 @@ object Client {
     sep()
 
     val addedHash: String = add.head.Hash
+
+
+    val stem: String = "/name/resolve"
+    val published: String = "Qmdc5rHtRJEdvde9wecKGLmEoHZRqxbvv1Bb6jFHSMKvZZ"
+    val tuples: Seq[(String, String)] = Seq("arg" -> published)
+//    val resolveUrl: URL = buildUrl(client.protocol, client.host, client.port, client.base, stem, tuples )
+//    println(resolveUrl)
+//    println(io.Source.fromURL(resolveUrl).mkString)
+    val resolve = client.resolve(published)
+    println(resolve)
+    System.exit(1)
+
+
     val cat: InputStream = client.cat(addedHash)
     println(io.Source.fromInputStream(cat).mkString)
 
@@ -384,6 +402,7 @@ object Client {
     val fileLs = client.fileLs(addedHash)
     println(fileLs.Objects.map)
     sep()
+
 
   }
 
