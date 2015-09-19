@@ -26,20 +26,20 @@ class Client(val host : String,
   //basic commands
   //
 
-  def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
-
   def add(paths: Seq[Path]) : Seq[Add] = jsonMapper.reader(classOf[Add])
-                                      .readValues(upload("/add", paths).reader())
-                                      .readAll()
-                                      .asScala
+    .readValues(upload("/add", paths).reader())
+    .readAll()
+    .asScala
 
   def addTree(path: Path) = add(walkTree(path))
 
-  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
-
-  def refs(key: String): Seq[Ref] = getRequestJsonSeq("/refs", classOf[Ref], toArgs(key))
+  def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
 
   def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
+
+  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
+
+  def refs(key: String): Seq[Ref] = getRequestAsJsonSeq("/refs", classOf[Ref], toArgs(key))
 
 
 
@@ -51,6 +51,8 @@ class Client(val host : String,
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
   def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], toArgs(key))
+
+  def blockPut(key: String, in: InputStream) = upload("/block/put", Seq((key, in)))
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
@@ -72,7 +74,7 @@ class Client(val host : String,
 
   def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
 
-  def ping(key: String) : Seq[Ping] = getRequestJsonSeq("/ping", classOf[Ping], toArgs(key))
+  def ping(key: String) : Seq[Ping] = getRequestAsJsonSeq("/ping", classOf[Ping], toArgs(key))
 
   //
   //tool commands
@@ -83,10 +85,6 @@ class Client(val host : String,
 
   def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
 
-
-  private val jsonMapper = new ObjectMapper()
-  jsonMapper.registerModule(DefaultScalaModule)
-
   private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
     val url = buildUrl(protocol, host, port, base, stem, query)
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
@@ -95,7 +93,7 @@ class Client(val host : String,
   private def getRequestAsJson[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
-  private def getRequestJsonSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
+  private def getRequestAsJsonSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
     //necessary for a few IPFS API calls that  return a concatenated sequence of json docs instead of a
     //valid JSON doc
     jsonMapper.reader(clazz)
@@ -109,7 +107,7 @@ class Client(val host : String,
     scala.io.Source.fromURL(url)
   }
 
-  private def upload(stem: String, paths: Seq[Path])  : BufferedSource = {
+  private def upload(stem: String, namedInputStreams: Seq[(String, InputStream)])  : BufferedSource = {
     val url = buildUrl(protocol, host, port, base, stem, Seq("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
@@ -123,19 +121,16 @@ class Client(val host : String,
     val out = conn.getOutputStream
     val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true)
 
-    val add = (path: Path) => {
-      val fileName = path.getFileName.toString
-
+    val add = (name: String,  in : InputStream) => {
       val headers: Seq[String] = Seq(
         "--" + boundary,
-        "Content-Disposition: file; name=\""+fileName+"\"; filename=\""+ fileName+"\"",
+        "Content-Disposition: file; name=\""+name+"\"; filename=\""+ name+"\"",
         "Content-Type: application/octet-stream",
         "Content-Transfer-Encoding: binary")
 
       headers.foreach(writer.append(_).append(LINE))
       writer.append(LINE)
-
-      val in = new FileInputStream(path.toFile)
+      writer.flush()
       try {
         val buffer = new Array[Byte](0x1000)
         var nRead = 0
@@ -144,16 +139,17 @@ class Client(val host : String,
         } != -1)
           out.write(buffer, 0, nRead)
       } finally {
+        out.flush()
         writer.append(LINE)
+        writer.flush()
         in.close
       }
     }
 
-    paths.foreach(add(_))
+    namedInputStreams.foreach(e  => add(e._1, e._2))
 
     Seq("--", boundary, "--", LINE).foreach(writer.append(_))
     writer.close
-
 
     io.Source.fromInputStream(conn.getInputStream)
   }
@@ -224,6 +220,11 @@ case class Ping(Success: String, Time: Int, Text:  String)
 
 
 object Client {
+  private val jsonMapper = new ObjectMapper()
+  jsonMapper.registerModule(DefaultScalaModule)
+
+  private val LINE = "\r\n"
+
 
   class FullyReadableInputStream(in: InputStream) {
     def toArray : Array[Byte] = {
@@ -240,23 +241,21 @@ object Client {
     }
   }
 
-  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
-
-  val LINE = "\r\n"
-
   def toArgs(key: String) = Seq("arg" -> key)
 
   def urlEncode(s: String) = URLEncoder.encode(s, "UTF-8")
 
   implicit def pathToFile(path: Path) = path.toFile
 
+  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
+
+  implicit def pathsToNamedInputStreams(paths:  Seq[Path])= paths.map(path  => (path.getFileName.toString,  new FileInputStream(path)))
+
   def walkTree(path: Path) : Seq[Path]  = path match {
     case _ if path.isFile => Seq(path)
     case _ if path.isDirectory => path.listFiles().flatMap(f => walkTree(f.toPath))
     case _ => Seq()
   }
-
-
 
   def buildUrl(protocol: String,
                host: String,
@@ -277,8 +276,6 @@ object Client {
 
     val client = new Client("localhost")
 
-    val addedHash = if(args.length > 0) args(0) else "QmaTEQ77PbwCzcdowWTqRJmxvRGZGQTstKpqznug7BZg87"
-
     val sep = () => println("*"*50)
 
     val paths = Seq("build.sbt", "README.md").map(Paths.get(_))
@@ -287,12 +284,14 @@ object Client {
 
     sep()
 
+    val addedHash: String = add.head.Hash
     val cat: InputStream = client.cat(addedHash)
-    //    println(io.Source.fromInputStream(cat).mkString)
+    println(io.Source.fromInputStream(cat).mkString)
+
     sep()
 
     val get: InputStream = client.get(addedHash)
-    //    println(io.Source.fromInputStream(get).mkString)
+    println(io.Source.fromInputStream(get).mkString)
     sep()
 
     val pinls =  client.getRequestSource("/pin/ls", Seq()).mkString
@@ -355,6 +354,10 @@ object Client {
     val fileLs = client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString
     println(fileLs)
     sep()
+
+    val head = Paths.get("/","home", "chrirs", "camping.md")
+    val blockPut = client.blockPut(head.getFileName.toString, new FileInputStream(head.toFile))
+    println(blockPut.mkString)
 
   }
 
