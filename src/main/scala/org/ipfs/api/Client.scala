@@ -82,15 +82,6 @@ class Client(val host : String,
 
   def publish(key: String) : Publish = getRequestAsJson("/name/publish", classOf[Publish], Seq("arg" -> key))
 
-  def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsJsonSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
-
-  def dhtGet(key: String) : DHTResponse = getRequestAsJson("/dht/get", classOf[DHTResponse], toArgs(key))
-
-  def dhtFindProvs(key: String) : JsonNode = getRequestAsGenericJson("/dht/findprovs", toArgs(key))
-
-  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/findpeers", toArgs(peerId))
-
-  def dhtQuery(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/query", toArgs(peerId))
   //
   //network  commands
   //
@@ -103,7 +94,23 @@ class Client(val host : String,
 
   def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
 
+  def swarmConnect(address: String) : JsonNode = getRequestAsGenericJson("/swarm/connect", toArgs(address))
+
+  def swarmDisconnect(address: String) : JsonNode = getRequestAsGenericJson("/swarm/disconnect", toArgs(address))
+
+
   def ping(key: String) : Seq[Ping] = getRequestAsJsonSeq("/ping", classOf[Ping], toArgs(key))
+
+  def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsJsonSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
+
+  def dhtGet(key: String) : DHTResponse = getRequestAsJson("/dht/get", classOf[DHTResponse], toArgs(key))
+
+  def dhtFindProvs(key: String) : JsonNode = getRequestAsGenericJson("/dht/findprovs", toArgs(key))
+
+  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/findpeers", toArgs(peerId))
+
+  def dhtQuery(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/query", toArgs(peerId))
+
 
   //
   //tool commands
