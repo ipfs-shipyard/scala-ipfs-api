@@ -122,14 +122,17 @@ class Client(val host : String,
 
   def dhtQuery(peerId:  String) : JsonNode = getRequestAsJson("/dht/query", toArgs(peerId))
 
-  def configShow : ConfigShow =  getRequestAsType("/config/show", classOf[ConfigShow])
-
-
   //
   //tool commands
   //
 
+
+  def configShow : ConfigShow =  getRequestAsType("/config/show", classOf[ConfigShow])
+
   def version : String =  getRequestAsJson("/version", Seq()).get("Version").asText()
+
+  def commands : JsonNode = getRequestAsJson("/commands", Seq())
+
 
   private def buildUrl(stem: String, query: Seq[(String, String)]) : URL = Client.buildUrl(protocol, host, port, base, stem, query)
 
