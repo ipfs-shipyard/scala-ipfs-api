@@ -249,7 +249,7 @@ object Client {
 
   implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
 
-  implicit def pathsToNamedInputStreams(paths:  Seq[Path])= paths.map(path  => (path.getFileName.toString,  new FileInputStream(path)))
+  implicit def pathsToNamedInputStreams(paths:  Seq[Path]) : Seq[(String, InputStream)] = paths.map(path  => (path.getFileName.toString,  new FileInputStream(path)))
 
   def walkTree(path: Path) : Seq[Path]  = path match {
     case _ if path.isFile => Seq(path)
