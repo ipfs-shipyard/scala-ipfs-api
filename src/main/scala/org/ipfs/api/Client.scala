@@ -45,11 +45,11 @@ class Client(val host : String,
 
   def refs(key: String): Seq[Ref] = getRequestAsSeq("/refs", classOf[Ref], toArgs(key))
 
-  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
-
   //
   //data structure commands
   //
+
+  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
   def blockStat(key: String): BlockStat = getRequestAsType("/block/stat", classOf[BlockStat], toArgs(key))
 
@@ -264,7 +264,7 @@ case class ConfigShow(Identity: Identity,
 
 case class Ref(Ref: String, Err: String)
 
-case class Ping(Success: String, Time: Int, Text:  String)
+case class Ping(Success: String, Time: Long, Text:  String)
 
 case class Arguments() {
   val map = new mutable.HashMap[String, String]()
@@ -450,7 +450,6 @@ object Client {
     println(pins)
     sep()
 
-//    val pinRm: Seq[String] = client.getRequestAsJson("/pin/rm", toArgs(addedHash)).get("Pinned").asScala.toArray.map(_.asText())
     val pinRm  = client.removePin(addedHash)
     println(pinRm)
     sep()
