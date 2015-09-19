@@ -80,7 +80,7 @@ class Client(val host : String,
 
   def publish(key: String) : Publish = getRequestAsType("/name/publish", classOf[Publish], Seq("arg" -> key))
 
-  def dnsResolve(address: String) : String = getRequestAsJson("/dns", toArgs("ipfs.io")).get("Path").asText()
+  def dnsResolve(address: String) : String = getRequestAsJson("/dns", toArgs(address)).get("Path").asText()
 
   def id : Id = getRequestAsType("/id", classOf[Id])
 
