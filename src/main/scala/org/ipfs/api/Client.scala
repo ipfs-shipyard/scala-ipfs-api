@@ -23,7 +23,7 @@ class Client(val host : String,
              val protocol: String = "http") {
 
   //TODO
-  //name, resolve, dns,  pin,  dht
+  //dns,  pin,  dht
 
   //
   //
@@ -78,6 +78,7 @@ class Client(val host : String,
 
   def resolve(key: String)  : Resolve =  getRequestAsJson("/name/resolve", classOf[Resolve], Seq("arg" -> key))
 
+  def publish(key: String) : Publish = getRequestAsJson("/name/publish", classOf[Publish], Seq("arg" -> key))
 
   //
   //
@@ -201,6 +202,7 @@ case class Addrs() {
 case class SwarmAddrs(Addrs: Addrs)
 
 case class Resolve(Path: String)
+case class Publish(Name: String, Value:  String)
 case class Identity(PeerID: String,  PrivKey: String)
 case class Datastore(Type: String,  Path: String)
 case class Addresses(Swarm:  Seq[String], API: String,  Gateway:String)
@@ -290,7 +292,7 @@ object Client {
                stem: String,
                query : Seq[(String, String)]) = {
 
-    val queryStem = "?" + query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2)).reduce((a,b) =>  a+"&"+b)
+    val queryStem = "?" + query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2)).mkString("&")
     val path = base + stem + queryStem
     new URL(protocol, host, port, path)
   }
@@ -311,17 +313,9 @@ object Client {
 
     val addedHash: String = add.head.Hash
 
-
-    val stem: String = "/name/resolve"
     val published: String = "Qmdc5rHtRJEdvde9wecKGLmEoHZRqxbvv1Bb6jFHSMKvZZ"
-    val tuples: Seq[(String, String)] = Seq("arg" -> published)
-//    val resolveUrl: URL = buildUrl(client.protocol, client.host, client.port, client.base, stem, tuples )
-//    println(resolveUrl)
-//    println(io.Source.fromURL(resolveUrl).mkString)
     val resolve = client.resolve(published)
     println(resolve)
-    System.exit(1)
-
 
     val cat: InputStream = client.cat(addedHash)
     println(io.Source.fromInputStream(cat).mkString)
@@ -403,6 +397,9 @@ object Client {
     println(fileLs.Objects.map)
     sep()
 
+    val publish = client.publish(addedHash)
+    println(publish)
+    sep()
 
   }
 
