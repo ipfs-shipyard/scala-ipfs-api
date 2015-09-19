@@ -23,14 +23,12 @@ class Client(val host : String,
              val protocol: String = "http") {
 
   //TODO
-  //dns,  pin,  dht
+  //pin,  mount
 
   //
   //
   //basic commands
   //
-
-  def buildUrl(stem: String, query: Seq[(String, String)]) : URL = Client.buildUrl(protocol, host, port, base, stem, query)
 
   def add(paths: Seq[Path]) : Seq[Add] = jsonMapper.reader(classOf[Add])
     .readValues(upload("/add", paths).reader())
@@ -43,92 +41,96 @@ class Client(val host : String,
 
   def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
 
-  def ls(key:  String): Ls =  getRequestAsJson("/ls", classOf[Ls], toArgs(key))
+  def ls(key:  String): Ls =  getRequestAsType("/ls", classOf[Ls], toArgs(key))
 
-  def refs(key: String): Seq[Ref] = getRequestAsJsonSeq("/refs", classOf[Ref], toArgs(key))
+  def refs(key: String): Seq[Ref] = getRequestAsSeq("/refs", classOf[Ref], toArgs(key))
+
+  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
   //
   //data structure commands
   //
 
-  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
-
-  def blockStat(key: String): BlockStat = getRequestAsJson("/block/stat", classOf[BlockStat], toArgs(key))
+  def blockStat(key: String): BlockStat = getRequestAsType("/block/stat", classOf[BlockStat], toArgs(key))
 
   def blockPut(key: String, in: InputStream) = upload("/block/put", Seq((key, in)))
 
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
-  def objectGet(key: String) : ObjectGet = getRequestAsJson("/object/get", classOf[ObjectGet], toArgs(key))
+  def objectGet(key: String) : ObjectGet = getRequestAsType("/object/get", classOf[ObjectGet], toArgs(key))
 
-  def objectStat(key: String) : ObjectStat = getRequestAsJson("/object/stat", classOf[ObjectStat], toArgs(key))
+  def objectStat(key: String) : ObjectStat = getRequestAsType("/object/stat", classOf[ObjectStat], toArgs(key))
 
-  def objectLinks(key: String): Object  = getRequestAsJson("/object/links", classOf[Object], toArgs(key))
+  def objectLinks(key: String): Object  = getRequestAsType("/object/links", classOf[Object], toArgs(key))
 
   def objectPut(path: Path) :  Object = {
     val paths : Seq[Path] = Seq(path)
     jsonMapper.readValue(upload("/object/put", paths).reader(), classOf[Object])
   }
 
-  def fileLs(key: String) : FileLs = getRequestAsJson("/file/ls", classOf[FileLs], Seq("arg" -> key))
+  def fileLs(key: String) : FileLs = getRequestAsType("/file/ls", classOf[FileLs], Seq("arg" -> key))
+
+  def gc {getRequestSource("/repo/gc", Seq())}
 
   //
   //advanced commands
   //
 
-  def gc {getRequestSource("/repo/gc", Seq())}
+  def resolve(key: String)  : Resolve =  getRequestAsType("/name/resolve", classOf[Resolve], Seq("arg" -> key))
 
-  def resolve(key: String)  : Resolve =  getRequestAsJson("/name/resolve", classOf[Resolve], Seq("arg" -> key))
+  def publish(key: String) : Publish = getRequestAsType("/name/publish", classOf[Publish], Seq("arg" -> key))
 
-  def publish(key: String) : Publish = getRequestAsJson("/name/publish", classOf[Publish], Seq("arg" -> key))
+  def dnsResolve(address: String) : String = getRequestAsJson("/dns", toArgs("ipfs.io")).get("Path").asText()
+
+  def id : Id = getRequestAsType("/id", classOf[Id])
 
   //
   //network  commands
   //
 
-  def id : Id = getRequestAsJson("/id", classOf[Id])
+  def bootstrap : Bootstrap = getRequestAsType("/bootstrap", classOf[Bootstrap])
 
-  def bootstrap : Bootstrap = getRequestAsJson("/bootstrap", classOf[Bootstrap])
+  def swarmPeers: SwarmPeers = getRequestAsType("/swarm/peers", classOf[SwarmPeers])
 
-  def swarmPeers: SwarmPeers = getRequestAsJson("/swarm/peers", classOf[SwarmPeers])
+  def swarmAdds: SwarmAddrs = getRequestAsType("/swarm/addrs", classOf[SwarmAddrs])
 
-  def swarmAdds: SwarmAddrs = getRequestAsJson("/swarm/addrs", classOf[SwarmAddrs])
+  def swarmConnect(address: String) : JsonNode = getRequestAsJson("/swarm/connect", toArgs(address))
 
-  def swarmConnect(address: String) : JsonNode = getRequestAsGenericJson("/swarm/connect", toArgs(address))
+  def swarmDisconnect(address: String) : JsonNode = getRequestAsJson("/swarm/disconnect", toArgs(address))
 
-  def swarmDisconnect(address: String) : JsonNode = getRequestAsGenericJson("/swarm/disconnect", toArgs(address))
+  def ping(key: String) : Seq[Ping] = getRequestAsSeq("/ping", classOf[Ping], toArgs(key))
 
 
-  def ping(key: String) : Seq[Ping] = getRequestAsJsonSeq("/ping", classOf[Ping], toArgs(key))
+  def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
 
-  def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsJsonSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
+  def dhtGet(key: String) : DHTResponse = getRequestAsType("/dht/get", classOf[DHTResponse], toArgs(key))
 
-  def dhtGet(key: String) : DHTResponse = getRequestAsJson("/dht/get", classOf[DHTResponse], toArgs(key))
+  def dhtFindProvs(key: String) : JsonNode = getRequestAsJson("/dht/findprovs", toArgs(key))
 
-  def dhtFindProvs(key: String) : JsonNode = getRequestAsGenericJson("/dht/findprovs", toArgs(key))
+  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsJson("/dht/findpeers", toArgs(peerId))
 
-  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/findpeers", toArgs(peerId))
+  def dhtQuery(peerId:  String) : JsonNode = getRequestAsJson("/dht/query", toArgs(peerId))
 
-  def dhtQuery(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/query", toArgs(peerId))
+  def configShow : ConfigShow =  getRequestAsType("/config/show", classOf[ConfigShow])
 
 
   //
   //tool commands
   //
 
-  def configShow : ConfigShow =  getRequestAsJson("/config/show", classOf[ConfigShow])
+  def version : String =  getRequestAsJson("/version", Seq()).get("Version").asText()
 
-  def version : APIVersion =  getRequestAsJson("/version", classOf[APIVersion])
+  private def buildUrl(stem: String, query: Seq[(String, String)]) : URL = Client.buildUrl(protocol, host, port, base, stem, query)
 
   private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
     val url = buildUrl(stem, query)
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
   }
 
-  private def getRequestAsJson[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
+  private def getRequestAsType[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
-  private def getRequestAsJsonSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
+  private def getRequestAsSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
     //necessary for a few IPFS API calls that  return a concatenated sequence of json docs instead of a
     //valid JSON doc
     jsonMapper.reader(clazz)
@@ -142,7 +144,7 @@ class Client(val host : String,
     scala.io.Source.fromURL(url)
   }
 
-  private def getRequestAsGenericJson(stem: String, query : Seq[(String, String)]) : JsonNode = jsonMapper.readTree(getRequestSource(stem, query).reader())
+  private def getRequestAsJson(stem: String, query : Seq[(String, String)]) : JsonNode = jsonMapper.readTree(getRequestSource(stem, query).reader())
 
   private def upload(stem: String, namedInputStreams: Seq[(String, InputStream)])  : BufferedSource = {
     val url = buildUrl(stem, Seq("stream-channels" -> "true"))
@@ -248,8 +250,6 @@ case class ConfigShow(Identity: Identity,
                       API: API,
                       Swarm: Swarm,
                       Log: Log)
-
-case class APIVersion(Version: String)
 
 case class Ref(Ref: String, Err: String)
 
@@ -429,6 +429,9 @@ object Client {
     val dhtGet = client.dhtGet(dhtKey)
     println(dhtGet)
     sep()
+
+    val dns = client.dnsResolve("ipfs.io")
+    println(dns)
   }
 
 }
