@@ -68,6 +68,12 @@ class Client(val host : String,
   }
 
   //
+  //data structure  commands
+
+  def fileLs(key: String) : FileLs = getRequestAsJson("/file/ls", classOf[FileLs], Seq("arg" -> key))
+
+  //
+  //
   //network  commands
   //
 
@@ -171,8 +177,8 @@ case class SwarmPeers(Strings: List[String])
 
 case class BlockStat(Key: String, Size: Int)
 
-case class Link(Name: String,  Hash: String, Size: Int, Type: Int)
-case class Object(Hash: String, Links: Seq[Link])
+case class Link(Name: String,  Hash: String, Size: Int, Type: String)
+case class Object(Hash: String, Size: Option[Int], Type: Option[String], Links: Seq[Link])
 case class ObjectGet(Links:Seq[Link], Data: String)
 case class ObjectStat(Hash: String, NumLinks: Int,  BlockSize: Int, LinksSize: Int,  DataSize: Int,  CumulativeSize: Int)
 
@@ -222,6 +228,15 @@ case class Ref(Ref: String, Err: String)
 
 case class Ping(Success: String, Time: Int, Text:  String)
 
+case class Arguments() {
+  val map = new mutable.HashMap[String, String]()
+  @JsonAnySetter def set(key: String, value: String) {map.put(key, value)}
+}
+case class Objects() {
+  val map = new mutable.HashMap[String, Object]()
+  @JsonAnySetter def set(key: String, o: Object) {map.put(key, o)}
+}
+case class FileLs(Arguments: Arguments, Objects: Objects)
 
 
 object Client {
@@ -356,10 +371,6 @@ object Client {
     println(objectStat)
     sep()
 
-    val fileLs = client.getRequestSource("/file/ls", Seq("arg" -> addedHash)).mkString
-    println(fileLs)
-    sep()
-
     val head = Paths.get("/","home", "chrirs", "camping.md")
     val blockPut = client.blockPut(head.getFileName.toString, new FileInputStream(head.toFile))
     println(blockPut.mkString)
@@ -368,6 +379,10 @@ object Client {
     val objectPutPath: Path = Paths.get("/", "home", "chrirs", "node.json")
     val objectPut  = client.objectPut(objectPutPath)
     println(objectPut)
+    sep()
+
+    val fileLs = client.fileLs(addedHash)
+    println(fileLs.Objects.map)
     sep()
 
   }
