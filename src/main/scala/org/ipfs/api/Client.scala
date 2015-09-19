@@ -90,6 +90,7 @@ class Client(val host : String,
 
   def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/findpeers", toArgs(peerId))
 
+  def dhtQuery(peerId:  String) : JsonNode = getRequestAsGenericJson("/dht/query", toArgs(peerId))
   //
   //network  commands
   //
