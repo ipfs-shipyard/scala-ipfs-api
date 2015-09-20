@@ -180,9 +180,9 @@
       </h4>
       <p class="shortcomment cmt">Adds local file contents to ipfs
 </p><div class="fullcomment"><div class="comment cmt"><p>Adds local file contents to ipfs
-</p></div><dl class="paramcmts block"><dt class="param">paths</dt><dd class="cmt"><p>files to be added</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></div><dl class="paramcmts block"><dt class="param">paths</dt><dd class="cmt"><p>Files to be added</p></dd><dt>returns</dt><dd class="cmt"><p>
 </p></dd></dl></div>
-    </li><li name="org.ipfs.api.Client#addPin" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#addPin" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addPin(key:String):Seq[String]"></a>
       <a id="addPin(String):Seq[String]"></a>
       <h4 class="signature">
@@ -194,7 +194,8 @@
         <span class="name">addPin</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Pins objects to local storage</p><div class="fullcomment"><div class="comment cmt"><p>Pins objects to local storage</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>Path to object to be pinned</p></dd><dt>returns</dt><dd class="cmt"><p>Path of object that have been pinned objects
+</p></dd></dl></div>
     </li><li name="org.ipfs.api.Client#addTree" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addTree(path:java.nio.file.Path):Seq[org.ipfs.api.Add]"></a>
       <a id="addTree(Path):Seq[Add]"></a>
@@ -207,7 +208,7 @@
         <span class="name">addTree</span><span class="params">(<span name="path">path: <span class="extype" name="java.nio.file.Path">Path</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Add.html" class="extype" name="org.ipfs.api.Add">Add</a>]</span>
       </span>
       </h4>
-      <p class="shortcomment cmt">Recursively add the directory contents to ipfs</p><div class="fullcomment"><div class="comment cmt"><p>Recursively add the directory contents to ipfs</p></div><dl class="paramcmts block"><dt class="param">path</dt><dd class="cmt"><p>root node to be added</p></dd><dt>returns</dt><dd class="cmt"><p>
+      <p class="shortcomment cmt">Recursively add the directory contents to ipfs</p><div class="fullcomment"><div class="comment cmt"><p>Recursively add the directory contents to ipfs</p></div><dl class="paramcmts block"><dt class="param">path</dt><dd class="cmt"><p>Root node to be added</p></dd><dt>returns</dt><dd class="cmt"><p>
 </p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
@@ -235,7 +236,7 @@
       </span>
       </h4>
       
-    </li><li name="org.ipfs.api.Client#blockGet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#blockGet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="blockGet(key:String):java.io.InputStream"></a>
       <a id="blockGet(String):InputStream"></a>
       <h4 class="signature">
@@ -247,8 +248,9 @@
         <span class="name">blockGet</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#blockPut" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Get a raw IPFS block</p><div class="fullcomment"><div class="comment cmt"><p>Get a raw IPFS block</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The base58 multihash of an existing ipfs block to get</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#blockPut" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="blockPut(key:String,in:java.io.InputStream):scala.io.BufferedSource"></a>
       <a id="blockPut(String,InputStream):BufferedSource"></a>
       <h4 class="signature">
@@ -260,8 +262,9 @@
         <span class="name">blockPut</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="in">in: <span class="extype" name="java.io.InputStream">InputStream</span></span>)</span><span class="result">: <span class="extype" name="scala.io.BufferedSource">BufferedSource</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#blockStat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt"> Stores input as an IPFS block</p><div class="fullcomment"><div class="comment cmt"><p> Stores input as an IPFS block</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"></dd><dt class="param">in</dt><dd class="cmt"><p>An input stream of data to be stored as an IPFS block</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#blockStat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="blockStat(key:String):org.ipfs.api.BlockStat"></a>
       <a id="blockStat(String):BlockStat"></a>
       <h4 class="signature">
@@ -273,7 +276,8 @@
         <span class="name">blockStat</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="BlockStat.html" class="extype" name="org.ipfs.api.BlockStat">BlockStat</a></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Print information of a raw IPFS block</p><div class="fullcomment"><div class="comment cmt"><p>Print information of a raw IPFS block</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>the base58 multihash of an existing ipfs block to get</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="org.ipfs.api.Client#bootstrap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="bootstrap:org.ipfs.api.Bootstrap"></a>
       <a id="bootstrap:Bootstrap"></a>
@@ -287,7 +291,7 @@
       </span>
       </h4>
       
-    </li><li name="org.ipfs.api.Client#cat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#cat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="cat(key:String):java.io.InputStream"></a>
       <a id="cat(String):InputStream"></a>
       <h4 class="signature">
@@ -299,7 +303,8 @@
         <span class="name">cat</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt"> Show ipfs object data</p><div class="fullcomment"><div class="comment cmt"><p> Show ipfs object data</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path of the ipfs object to be outputted</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -319,7 +324,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="org.ipfs.api.Client#commands" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#commands" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="commands:com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="commands:JsonNode"></a>
       <h4 class="signature">
@@ -331,8 +336,9 @@
         <span class="name">commands</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#configShow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Lists all available commands (and subcommands)</p><div class="fullcomment"><div class="comment cmt"><p>Lists all available commands (and subcommands)</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#configShow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="configShow:org.ipfs.api.ConfigShow"></a>
       <a id="configShow:ConfigShow"></a>
       <h4 class="signature">
@@ -344,8 +350,11 @@
         <span class="name">configShow</span><span class="result">: <a href="ConfigShow.html" class="extype" name="org.ipfs.api.ConfigShow">ConfigShow</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dhtFindPeers" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Outputs the content of the host configuration parameters
+WARNING: Your private key will be included in the output of this command.</p><div class="fullcomment"><div class="comment cmt"><p>Outputs the content of the host configuration parameters
+WARNING: Your private key will be included in the output of this command.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dhtFindPeers" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dhtFindPeers(peerId:String):com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="dhtFindPeers(String):JsonNode"></a>
       <h4 class="signature">
@@ -357,8 +366,9 @@
         <span class="name">dhtFindPeers</span><span class="params">(<span name="peerId">peerId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dhtFindProvs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">peerId</dt><dd class="cmt"><p>The peer to search for</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dhtFindProvs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dhtFindProvs(key:String):com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="dhtFindProvs(String):JsonNode"></a>
       <h4 class="signature">
@@ -370,8 +380,9 @@
         <span class="name">dhtFindProvs</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dhtGet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Retrieve a list of peers who are able to provide the value requested</p><div class="fullcomment"><div class="comment cmt"><p>Retrieve a list of peers who are able to provide the value requested</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The key to find providers for</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dhtGet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dhtGet(key:String):org.ipfs.api.DHTResponse"></a>
       <a id="dhtGet(String):DHTResponse"></a>
       <h4 class="signature">
@@ -383,8 +394,9 @@
         <span class="name">dhtGet</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="DHTResponse.html" class="extype" name="org.ipfs.api.DHTResponse">DHTResponse</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dhtPut" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Retrieve the value stored in the dht at the given key</p><div class="fullcomment"><div class="comment cmt"><p>Retrieve the value stored in the dht at the given key</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The key to find a value for</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dhtPut" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dhtPut(key:String,value:String):Seq[org.ipfs.api.DHTResponse]"></a>
       <a id="dhtPut(String,String):Seq[DHTResponse]"></a>
       <h4 class="signature">
@@ -396,8 +408,9 @@
         <span class="name">dhtPut</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="DHTResponse.html" class="extype" name="org.ipfs.api.DHTResponse">DHTResponse</a>]</span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dhtQuery" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Store the given key value pair in the dht</p><div class="fullcomment"><div class="comment cmt"><p>Store the given key value pair in the dht</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The key to store the value at</p></dd><dt class="param">value</dt><dd class="cmt"><p>The value to store</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dhtQuery" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dhtQuery(peerId:String):com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="dhtQuery(String):JsonNode"></a>
       <h4 class="signature">
@@ -409,8 +422,9 @@
         <span class="name">dhtQuery</span><span class="params">(<span name="peerId">peerId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#dnsResolve" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Run a 'findClosestPeers' query through the DHT</p><div class="fullcomment"><div class="comment cmt"><p>Run a 'findClosestPeers' query through the DHT</p></div><dl class="paramcmts block"><dt class="param">peerId</dt><dd class="cmt"><p>The peerID to run the query against</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#dnsResolve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dnsResolve(address:String):String"></a>
       <a id="dnsResolve(String):String"></a>
       <h4 class="signature">
@@ -422,7 +436,8 @@
         <span class="name">dnsResolve</span><span class="params">(<span name="address">address: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Resolve a DNS link</p><div class="fullcomment"><div class="comment cmt"><p>Resolve a DNS link</p></div><dl class="paramcmts block"><dt class="param">address</dt><dd class="cmt"><p>The domain-name name to resolve.</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -449,7 +464,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="org.ipfs.api.Client#fileLs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#fileLs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="fileLs(key:String):org.ipfs.api.FileLs"></a>
       <a id="fileLs(String):FileLs"></a>
       <h4 class="signature">
@@ -461,7 +476,8 @@
         <span class="name">fileLs</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="FileLs.html" class="extype" name="org.ipfs.api.FileLs">FileLs</a></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">List directory contents for Unix-filesystem objects</p><div class="fullcomment"><div class="comment cmt"><p>List directory contents for Unix-filesystem objects</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path to the IPFS object(s) to list links from</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -493,8 +509,23 @@
         <span class="name">gc</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#get" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Perform a garbage collection sweep on the repo
+</p>
+    </li><li name="org.ipfs.api.Client#get" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="get(key:String,output:java.nio.file.Path):Unit"></a>
+      <a id="get(String,Path):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">get</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="output">output: <span class="extype" name="java.nio.file.Path">Path</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Writes ipfs object data to a local file</p><div class="fullcomment"><div class="comment cmt"><p>Writes ipfs object data to a local file</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path of the ipfs object to be outputted</p></dd><dt class="param">output</dt><dd class="cmt"><p>Path to store ipfs object data
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#get" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="get(key:String):java.io.InputStream"></a>
       <a id="get(String):InputStream"></a>
       <h4 class="signature">
@@ -506,7 +537,8 @@
         <span class="name">get</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Stream ipfs object data</p><div class="fullcomment"><div class="comment cmt"><p>Stream ipfs object data</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path of the ipfs object to be outputted</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -546,7 +578,7 @@
       </span>
       </h4>
       
-    </li><li name="org.ipfs.api.Client#id" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#id" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="id:org.ipfs.api.Id"></a>
       <a id="id:Id"></a>
       <h4 class="signature">
@@ -558,7 +590,8 @@
         <span class="name">id</span><span class="result">: <a href="Id.html" class="extype" name="org.ipfs.api.Id">Id</a></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Show ID info of IPFS node</p><div class="fullcomment"><div class="comment cmt"><p>Show ID info of IPFS node</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -572,7 +605,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="org.ipfs.api.Client#ls" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#ls" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ls(key:String):org.ipfs.api.Ls"></a>
       <a id="ls(String):Ls"></a>
       <h4 class="signature">
@@ -584,8 +617,9 @@
         <span class="name">ls</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Ls.html" class="extype" name="org.ipfs.api.Ls">Ls</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#lsPins" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">List links from an ipfs object.</p><div class="fullcomment"><div class="comment cmt"><p>List links from an ipfs object.</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path of the ipfs object to list links from</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#lsPins" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="lsPins:com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="lsPins:JsonNode"></a>
       <h4 class="signature">
@@ -597,7 +631,8 @@
         <span class="name">lsPins</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt"> List objects pinned to local storage</p><div class="fullcomment"><div class="comment cmt"><p> List objects pinned to local storage</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -637,7 +672,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="org.ipfs.api.Client#objectData" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#objectData" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objectData(key:String):java.io.InputStream"></a>
       <a id="objectData(String):InputStream"></a>
       <h4 class="signature">
@@ -649,8 +684,9 @@
         <span class="name">objectData</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#objectGet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Outputs the raw bytes in an IPFS object</p><div class="fullcomment"><div class="comment cmt"><p>Outputs the raw bytes in an IPFS object</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>key of the object to retrieve, in base58-encoded multihash format</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#objectGet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objectGet(key:String):org.ipfs.api.ObjectGet"></a>
       <a id="objectGet(String):ObjectGet"></a>
       <h4 class="signature">
@@ -662,8 +698,9 @@
         <span class="name">objectGet</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="ObjectGet.html" class="extype" name="org.ipfs.api.ObjectGet">ObjectGet</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#objectLinks" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt"> Get and serialize the DAG node named by &lt;key&gt;</p><div class="fullcomment"><div class="comment cmt"><p> Get and serialize the DAG node named by &lt;key&gt;</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>Key of the object to retrieve (in base58-encoded multihash format)</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#objectLinks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objectLinks(key:String):org.ipfs.api.Object"></a>
       <a id="objectLinks(String):Object"></a>
       <h4 class="signature">
@@ -675,8 +712,9 @@
         <span class="name">objectLinks</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Object.html" class="extype" name="org.ipfs.api.Object">Object</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#objectPut" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Outputs the links pointed to by the specified object</p><div class="fullcomment"><div class="comment cmt"><p>Outputs the links pointed to by the specified object</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>Key of the object to retrieve, in base58-encoded multihash format</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#objectPut" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objectPut(path:java.nio.file.Path):org.ipfs.api.Object"></a>
       <a id="objectPut(Path):Object"></a>
       <h4 class="signature">
@@ -688,8 +726,17 @@
         <span class="name">objectPut</span><span class="params">(<span name="path">path: <span class="extype" name="java.nio.file.Path">Path</span></span>)</span><span class="result">: <a href="Object.html" class="extype" name="org.ipfs.api.Object">Object</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#objectStat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Stores input as a DAG object, outputs its key</p><div class="fullcomment"><div class="comment cmt"><p>Stores input as a DAG object, outputs its key</p></div><dl class="paramcmts block"><dt class="param">path</dt><dd class="cmt"><p>Input file path formatted like an org.ipfs.api.ObjectGet eg.</p><p>        {
+            &quot;Data&quot;: &quot;another&quot;,
+            &quot;Links&quot;: [ {
+                &quot;Name&quot;: &quot;some link&quot;,
+                &quot;Hash&quot;: &quot;QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V&quot;,
+                &quot;Size&quot;: 8
+            } ]
+        }
+</p></dd><dt>returns</dt><dd class="cmt"><p>org.ipfs.api.Object
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#objectStat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objectStat(key:String):org.ipfs.api.ObjectStat"></a>
       <a id="objectStat(String):ObjectStat"></a>
       <h4 class="signature">
@@ -701,9 +748,10 @@
         <span class="name">objectStat</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="ObjectStat.html" class="extype" name="org.ipfs.api.ObjectStat">ObjectStat</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#ping" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ping(key:String):Seq[org.ipfs.api.Ping]"></a>
+      <p class="shortcomment cmt">Get stats for the DAG node named by &lt;key&gt;</p><div class="fullcomment"><div class="comment cmt"><p>Get stats for the DAG node named by &lt;key&gt;</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>Key of the object to retrieve (in base58-encoded multihash format)</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#ping" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ping(peerId:String):Seq[org.ipfs.api.Ping]"></a>
       <a id="ping(String):Seq[Ping]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -711,10 +759,11 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ping</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Ping.html" class="extype" name="org.ipfs.api.Ping">Ping</a>]</span>
+        <span class="name">ping</span><span class="params">(<span name="peerId">peerId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Ping.html" class="extype" name="org.ipfs.api.Ping">Ping</a>]</span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Send an echo request packets to a IPFS host</p><div class="fullcomment"><div class="comment cmt"><p>Send an echo request packets to a IPFS host</p></div><dl class="paramcmts block"><dt class="param">peerId</dt><dd class="cmt"><p>ID of peer to be pinged</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="org.ipfs.api.Client#port" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="port:Int"></a>
       <a id="port:Int"></a>
@@ -741,7 +790,7 @@
       </span>
       </h4>
       
-    </li><li name="org.ipfs.api.Client#publish" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#publish" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="publish(key:String):org.ipfs.api.Publish"></a>
       <a id="publish(String):Publish"></a>
       <h4 class="signature">
@@ -753,8 +802,9 @@
         <span class="name">publish</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Publish.html" class="extype" name="org.ipfs.api.Publish">Publish</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#refs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Publish an object to IPNS</p><div class="fullcomment"><div class="comment cmt"><p>Publish an object to IPNS</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#refs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="refs(key:String):Seq[org.ipfs.api.Ref]"></a>
       <a id="refs(String):Seq[Ref]"></a>
       <h4 class="signature">
@@ -766,8 +816,9 @@
         <span class="name">refs</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Ref.html" class="extype" name="org.ipfs.api.Ref">Ref</a>]</span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#removePin" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Lists links (references) from an ipfs object</p><div class="fullcomment"><div class="comment cmt"><p>Lists links (references) from an ipfs object</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The path of the ipfs object to list refs from</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#removePin" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="removePin(key:String):Seq[String]"></a>
       <a id="removePin(String):Seq[String]"></a>
       <h4 class="signature">
@@ -779,8 +830,9 @@
         <span class="name">removePin</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#resolve" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Unpin an object from local storage</p><div class="fullcomment"><div class="comment cmt"><p>Unpin an object from local storage</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>Path to object to be unpinned</p></dd><dt>returns</dt><dd class="cmt"><p>Path of object that have been unpinned objects
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#resolve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="resolve(key:String):org.ipfs.api.Resolve"></a>
       <a id="resolve(String):Resolve"></a>
       <h4 class="signature">
@@ -792,8 +844,9 @@
         <span class="name">resolve</span><span class="params">(<span name="key">key: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Resolve.html" class="extype" name="org.ipfs.api.Resolve">Resolve</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#swarmAdds" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Gets the value currently published at an IPNS name</p><div class="fullcomment"><div class="comment cmt"><p>Gets the value currently published at an IPNS name</p></div><dl class="paramcmts block"><dt class="param">key</dt><dd class="cmt"><p>The name to resolve</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#swarmAdds" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="swarmAdds:org.ipfs.api.SwarmAddrs"></a>
       <a id="swarmAdds:SwarmAddrs"></a>
       <h4 class="signature">
@@ -805,8 +858,9 @@
         <span class="name">swarmAdds</span><span class="result">: <a href="SwarmAddrs.html" class="extype" name="org.ipfs.api.SwarmAddrs">SwarmAddrs</a></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#swarmConnect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Lists all addresses this node is aware of</p><div class="fullcomment"><div class="comment cmt"><p>Lists all addresses this node is aware of</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#swarmConnect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="swarmConnect(address:String):com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="swarmConnect(String):JsonNode"></a>
       <h4 class="signature">
@@ -818,8 +872,9 @@
         <span class="name">swarmConnect</span><span class="params">(<span name="address">address: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#swarmDisconnect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Opens a new direct connection to a peer address</p><div class="fullcomment"><div class="comment cmt"><p>Opens a new direct connection to a peer address</p></div><dl class="paramcmts block"><dt class="param">address</dt><dd class="cmt"><p>The address to connect in ipfs multiaddr format</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#swarmDisconnect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="swarmDisconnect(address:String):com.fasterxml.jackson.databind.JsonNode"></a>
       <a id="swarmDisconnect(String):JsonNode"></a>
       <h4 class="signature">
@@ -831,8 +886,9 @@
         <span class="name">swarmDisconnect</span><span class="params">(<span name="address">address: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.fasterxml.jackson.databind.JsonNode">JsonNode</span></span>
       </span>
       </h4>
-      
-    </li><li name="org.ipfs.api.Client#swarmPeers" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Closes a connection to a peer address</p><div class="fullcomment"><div class="comment cmt"><p>Closes a connection to a peer address</p></div><dl class="paramcmts block"><dt class="param">address</dt><dd class="cmt"><p>The address to disconnect from in ipfs multiaddr format</p></dd><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
+    </li><li name="org.ipfs.api.Client#swarmPeers" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="swarmPeers:org.ipfs.api.SwarmPeers"></a>
       <a id="swarmPeers:SwarmPeers"></a>
       <h4 class="signature">
@@ -844,7 +900,8 @@
         <span class="name">swarmPeers</span><span class="result">: <a href="SwarmPeers.html" class="extype" name="org.ipfs.api.SwarmPeers">SwarmPeers</a></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Lists the set of peers this node is connected to</p><div class="fullcomment"><div class="comment cmt"><p>Lists the set of peers this node is connected to</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>List peers with open connections
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -871,7 +928,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="org.ipfs.api.Client#version" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="org.ipfs.api.Client#version" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="version:String"></a>
       <a id="version:String"></a>
       <h4 class="signature">
@@ -883,7 +940,8 @@
         <span class="name">version</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Shows ipfs version information</p><div class="fullcomment"><div class="comment cmt"><p>Shows ipfs version information</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
