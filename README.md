@@ -12,12 +12,12 @@ Copy ipfs.api.jar into your Java classpath.
 
 ### Java usage
 
-A working Java example available [here](https://github.com/ipfs/scala-ipfs-api/blob/master/src/main/java/org.ipfs.api.example/Example.java)
+A working Java example available [here](https://github.com/ipfs/scala-ipfs-api/blob/master/src/main/java/org.ipfs.api.example/Example.java).
  
 IPFS API calls are available using a Client instance.
 
 <pre>
-Client client = new Client(host, 5001, "/api/v0", "http");
+Client client = new Client("localhost", 5001, "/api/v0", "http");
 </pre>
 
 Almost all of the API calls return strongly typed POJOs, for example the node configuration can be retrieved with 
@@ -37,11 +37,17 @@ ConfigShow configShow = client.configShow();
         Add[] add = client.add(new Path[]{addPath});
         Add added = add[0];
         System.out.println("Added "+ added.Name() +" with hash "+  added.Hash());
+
+        //get from IPFS
+        Path getPath = Paths.get("ipfs.get.tmp.txt");
+        try (InputStream inputStream = client.cat(added.Hash())) {
+            Files.copy(inputStream, getPath, StandardCopyOption.REPLACE_EXISTING);
+        }
 </pre>
 
 ### Building
 
-The package  can be  build using [sbt](http://www.scala-sbt.org/).
+The package can be built using [sbt](http://www.scala-sbt.org/).
 
 ##### compiling
 
