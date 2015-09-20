@@ -74,3 +74,9 @@ which will create a jar
 > target/scala-2.10/ipfs.api.jar 
 
 Note, this includes the (only) project dependency [Jackson](https://github.com/FasterXML/jackson)
+
+### Testing
+
+Unit / Integration tests can be run  with
+
+> sbt test

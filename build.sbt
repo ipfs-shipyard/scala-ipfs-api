@@ -8,4 +8,4 @@ libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.2.
 
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.2.2"
 
-//assemblyJarName in assembly := "ipfs.api.jar"
+libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "3.6.4" % "test")
