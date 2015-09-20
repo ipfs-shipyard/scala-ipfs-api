@@ -1,28 +1,6 @@
 # scala-ipfs-api
 
-A wrapper of the IPFS Client HTTP-API for Java/Scala.
-
-### Building
-
-The package  can be  build using [sbt](http://www.scala-sbt.org/).
-
-##### package sources only
-
-To build only the sources in the project,  use
-
-> sbt packageBin  
-
-which will create a jar somewhere like target/scala-2.10/scala-ipfs-api_2.10-1.0.0-SNAPSHOT.jar
-
-##### stand-alone jar 
-
-To create a  stand-alone jar that includes all dependencies  needed for including in a Java/Scala project do 
-
-> sbt assembly
-
-which will create a jar 
-
-> target/scala-2.10/ipfs.api.jar 
+A JVM Client library for interacting with IPFS from Java/Scala.
 
 ### Documentation
 
@@ -30,4 +8,59 @@ which will create a jar
 
 ### Including in your Java/Scala project
 
+Copy ipfs.api.jar into your Java classpath.
+
 ### Java usage
+
+A working Java example available [here](https://github.com/ipfs/scala-ipfs-api/blob/master/src/main/java/org.ipfs.api.example/Example.java)
+ 
+IPFS API calls are available using a Client instance.
+
+> Client client = new Client(host, 5001, "/api/v0", "http");
+
+Almost all of the API calls return strongly typed POJOs, for example the node configuration can be retrieved with 
+
+> ConfigShow configShow = client.configShow(); 
+
+#####  Adding and retrieving data
+
+<pre>
+        //create test file
+        Path addPath = Paths.get("ipfs.put.tmp.txt");
+        Files.write(addPath, "Hello IPFS!".getBytes(), StandardOpenOption.CREATE);
+
+        //add to IPFS
+        Add[] add = client.add(new Path[]{addPath});
+        Add added = add[0];
+        System.out.println("Added "+ added.Name() +" with hash "+  added.Hash());
+</pre>
+
+### Building
+
+The package  can be  build using [sbt](http://www.scala-sbt.org/).
+
+##### compiling
+
+Compile the project with
+
+> sbt compile
+
+##### package sources only
+
+To build a Java archive of **only the project sources**,  use
+
+> sbt packageBin  
+
+which will create a jar somewhere like target/scala-2.10/scala-ipfs-api_2.10-1.0.0-SNAPSHOT.jar
+
+##### stand-alone jar 
+
+To create a stand-alone jar that includes all dependencies needed for including in a Java/Scala project do 
+
+> sbt assembly
+
+which will create a jar 
+
+> target/scala-2.10/ipfs.api.jar 
+
+Note, this includes the (only) project dependency (Jackson)[https://github.com/FasterXML/jackson].
