@@ -497,6 +497,8 @@ object Client {
       out.toByteArray
     }
   }
+  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
+
 
   private def toArgs(key: String*) : Seq[(String, String)] = key.map(("arg" -> _))
 
@@ -504,7 +506,6 @@ object Client {
 
   implicit def pathToFile(path: Path) = path.toFile
 
-  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
 
   implicit def pathsToNamedInputStreams(paths:  Array[Path]) : Array[(String, InputStream)] = paths.map(path  => (path.getFileName.toString,  new FileInputStream(path)))
 
