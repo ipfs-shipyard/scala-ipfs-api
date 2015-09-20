@@ -1,10 +1,10 @@
 # scala-ipfs-api
 
-A JVM Client library for interacting with IPFS from Java/Scala.
+A JVM client library for interacting with IPFS from Java/Scala environments.
 
 ### Documentation
 
-[Full java-doc](http://ipfs.github.io/scala-ipfs-api/#org.ipfs.api.Client).
+A full java-doc site is available [here](http://ipfs.github.io/scala-ipfs-api/#org.ipfs.api.Client).
 
 ### Including in your Java/Scala project
 
@@ -16,11 +16,15 @@ A working Java example available [here](https://github.com/ipfs/scala-ipfs-api/b
  
 IPFS API calls are available using a Client instance.
 
-> Client client = new Client(host, 5001, "/api/v0", "http");
+<pre>
+Client client = new Client(host, 5001, "/api/v0", "http");
+</pre>
 
 Almost all of the API calls return strongly typed POJOs, for example the node configuration can be retrieved with 
 
-> ConfigShow configShow = client.configShow(); 
+<pre>
+ConfigShow configShow = client.configShow(); 
+</pre>
 
 #####  Adding and retrieving data
 
@@ -63,4 +67,4 @@ which will create a jar
 
 > target/scala-2.10/ipfs.api.jar 
 
-Note, this includes the (only) project dependency (Jackson)[https://github.com/FasterXML/jackson].
+Note, this includes the (only) project dependency [Jackson](https://github.com/FasterXML/jackson)
