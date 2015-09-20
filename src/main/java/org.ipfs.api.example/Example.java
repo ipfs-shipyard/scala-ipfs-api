@@ -1,4 +1,4 @@
-package ipfs.org.api.example;
+package org.ipfs.api.example;
 
 
 import org.ipfs.api.Add;
