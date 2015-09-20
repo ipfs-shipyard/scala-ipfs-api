@@ -13,7 +13,7 @@ class ClientSpec extends Specification {
   isolated
 
   val client = new Client("localhost")
-  "IPFS client " should {
+  "IPFS client" should {
 
     "show the version" in  {
       client.version mustEqual("0.3.8-dev")
@@ -40,6 +40,13 @@ class ClientSpec extends Specification {
       util.Arrays.equals(toArray(in), data) mustEqual(true)
     }
 
+    "dht put and get" in {
+      val (key, value) = (random.nextString(10), random.nextString(10))
+      val puts: Array[DHTResponse] = client.dhtPut(key, value)
+      puts.length mustNotEqual(0)
+
+      client.dhtGet(key).Extra mustEqual value
+    }
   }
 
   private def randomBytes = {
