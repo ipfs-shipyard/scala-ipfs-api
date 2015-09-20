@@ -2,7 +2,7 @@ package org.ipfs.api
 
 import java.io._
 import java.net.{HttpURLConnection, URLEncoder, URL}
-import java.nio.file.{Paths, Path}
+import java.nio.file.{StandardCopyOption, Files, Paths, Path}
 import collection.JavaConverters._
 
 import com.fasterxml.jackson.annotation.JsonAnySetter
@@ -30,67 +30,202 @@ class Client(val host : String,
   //basic commands
   //
 
+  /**
+   * Adds local file contents to ipfs
+   *
+   * @param paths Files to be added
+   * @return
+   */
   def add(paths: Seq[Path]) : Seq[Add] = jsonMapper.reader(classOf[Add])
     .readValues(upload("/add", paths).reader())
     .readAll()
     .asScala
 
+  /**
+    * Recursively add the directory contents to ipfs
+    * @param path Root node to be added
+    * @return
+    */
   def addTree(path: Path) = add(walkTree(path))
 
+  /**
+   *  Show ipfs object data
+   * @param key The path of the ipfs object to be outputted
+   * @return
+   */
   def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
+
+  /**
+   * Stream ipfs object data
+   * @param key The path of the ipfs object to be outputted
+   * @return
+   */
 
   def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
 
+  /**
+   * Writes ipfs object data to a local file
+   * @param key The path of the ipfs object to be outputted
+   * @param output Path to store ipfs object data
+   */
+  def get(key: String, output: Path) {
+    val in: InputStream = getRequestInputStream("/get", toArgs(key))
+    Files.copy(in, output, StandardCopyOption.REPLACE_EXISTING)
+    in.close()
+  }
+
+  /**
+   * List links from an ipfs object.
+   * @param key The path of the ipfs object to list links from
+   * @return
+   */
   def ls(key:  String): Ls =  getRequestAsType("/ls", classOf[Ls], toArgs(key))
 
+  /**
+   * Lists links (references) from an ipfs object
+   * @param key The path of the ipfs object to list refs from
+   * @return
+   */
   def refs(key: String): Seq[Ref] = getRequestAsSeq("/refs", classOf[Ref], toArgs(key))
 
   //
   //data structure commands
   //
 
+  /**
+   * Get a raw IPFS block
+   * @param key The base58 multihash of an existing ipfs block to get
+   * @return
+   */
   def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
 
+  /**
+   * Print information of a raw IPFS block
+   * @param key the base58 multihash of an existing ipfs block to get
+   * @return
+   */
   def blockStat(key: String): BlockStat = getRequestAsType("/block/stat", classOf[BlockStat], toArgs(key))
 
+  /**
+   *  Stores input as an IPFS block
+   * @param key
+   * @param in An input stream of data to be stored as an IPFS block
+   * @return
+   */
   def blockPut(key: String, in: InputStream) = upload("/block/put", Seq((key, in)))
 
+  /**
+   * Outputs the raw bytes in an IPFS object
+   * @param key key of the object to retrieve, in base58-encoded multihash format
+   * @return
+   */
   def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
 
+  /**
+   *  Get and serialize the DAG node named by <key>
+   * @param key Key of the object to retrieve (in base58-encoded multihash format)
+   * @return
+   */
   def objectGet(key: String) : ObjectGet = getRequestAsType("/object/get", classOf[ObjectGet], toArgs(key))
 
+  /**
+   * Get stats for the DAG node named by <key>
+   * @param key Key of the object to retrieve (in base58-encoded multihash format)
+   * @return
+   */
   def objectStat(key: String) : ObjectStat = getRequestAsType("/object/stat", classOf[ObjectStat], toArgs(key))
 
+  /**
+   * Outputs the links pointed to by the specified object
+   * @param key Key of the object to retrieve, in base58-encoded multihash format
+   * @return
+   */
   def objectLinks(key: String): Object  = getRequestAsType("/object/links", classOf[Object], toArgs(key))
 
+  /**
+   * Stores input as a DAG object, outputs its key
+   * @param path Input file path formatted like an org.ipfs.api.ObjectGet eg.
+
+        {
+            "Data": "another",
+            "Links": [ {
+                "Name": "some link",
+                "Hash": "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V",
+                "Size": 8
+            } ]
+        }
+
+   * @return org.ipfs.api.Object
+   */
   def objectPut(path: Path) :  Object = {
     val paths : Seq[Path] = Seq(path)
     jsonMapper.readValue(upload("/object/put", paths).reader(), classOf[Object])
   }
 
+  /**
+   * List directory contents for Unix-filesystem objects
+   * @param key The path to the IPFS object(s) to list links from
+   * @return
+   */
   def fileLs(key: String) : FileLs = getRequestAsType("/file/ls", classOf[FileLs], Seq("arg" -> key))
 
+  /**
+   * Perform a garbage collection sweep on the repo
+   */
   def gc {getRequestSource("/repo/gc", Seq())}
 
   //
   //advanced commands
   //
 
+  /**
+   * Gets the value currently published at an IPNS name
+   * @param key The name to resolve
+   * @return
+   */
   def resolve(key: String)  : Resolve =  getRequestAsType("/name/resolve", classOf[Resolve], Seq("arg" -> key))
 
+  /**
+   * Publish an object to IPNS
+   * @param key
+   * @return
+   */
   def publish(key: String) : Publish = getRequestAsType("/name/publish", classOf[Publish], Seq("arg" -> key))
 
+  /**
+   * Resolve a DNS link
+   * @param address The domain-name name to resolve.
+   * @return
+   */
   def dnsResolve(address: String) : String = getRequestAsJson("/dns", toArgs(address)).get("Path").asText()
 
+  /**
+   * Show ID info of IPFS node
+   * @return
+   */
   def id : Id = getRequestAsType("/id", classOf[Id])
 
+  /**
+   *  List objects pinned to local storage
+   * @return
+   */
   def lsPins : JsonNode = getRequestAsJson("/pin/ls", Seq()).get("Keys")
 
+  /**
+   * Pins objects to local storage
+   * @param key Path to object to be pinned
+   * @return Path of object that have been pinned objects
+   */
   def addPin(key: String) : Seq[String] = getRequestAsJson("/pin/add", toArgs(key)).get("Pinned")
     .asScala
     .toArray
     .map(_.toString)
 
+  /**
+   * Unpin an object from local storage
+   * @param key Path to object to be unpinned
+   * @return Path of object that have been unpinned objects
+   */
   def removePin(key: String) : Seq[String] = getRequestAsJson("/pin/rm", toArgs(key)).get("Pinned")
     .asScala
     .toArray
@@ -101,36 +236,95 @@ class Client(val host : String,
 
   def bootstrap : Bootstrap = getRequestAsType("/bootstrap", classOf[Bootstrap])
 
+  /**
+   * Lists the set of peers this node is connected to
+   * @return List peers with open connections
+   */
   def swarmPeers: SwarmPeers = getRequestAsType("/swarm/peers", classOf[SwarmPeers])
 
+  /**
+   * Lists all addresses this node is aware of
+   * @return
+   */
   def swarmAdds: SwarmAddrs = getRequestAsType("/swarm/addrs", classOf[SwarmAddrs])
 
+  /**
+   * Opens a new direct connection to a peer address
+   * @param address The address to connect in ipfs multiaddr format
+   * @return
+   */
   def swarmConnect(address: String) : JsonNode = getRequestAsJson("/swarm/connect", toArgs(address))
 
+  /**
+   * Closes a connection to a peer address
+   * @param address The address to disconnect from in ipfs multiaddr format
+   * @return
+   */
   def swarmDisconnect(address: String) : JsonNode = getRequestAsJson("/swarm/disconnect", toArgs(address))
 
-  def ping(key: String) : Seq[Ping] = getRequestAsSeq("/ping", classOf[Ping], toArgs(key))
+  /**
+   * Send an echo request packets to a IPFS host
+   * @param peerId ID of peer to be pinged
+   * @return
+   */
+  def ping(peerId: String) : Seq[Ping] = getRequestAsSeq("/ping", classOf[Ping], toArgs(peerId))
 
-
+  /**
+   * Store the given key value pair in the dht
+   * @param key The key to store the value at
+   * @param value The value to store
+   * @return
+   */
   def dhtPut(key: String, value: String) : Seq[DHTResponse] =  getRequestAsSeq("/dht/put", classOf[DHTResponse], Seq("arg" -> key, "arg" -> value))
 
+  /**
+   * Retrieve the value stored in the dht at the given key
+   * @param key The key to find a value for
+   * @return
+   */
   def dhtGet(key: String) : DHTResponse = getRequestAsType("/dht/get", classOf[DHTResponse], toArgs(key))
 
+  /**
+   * Retrieve a list of peers who are able to provide the value requested
+   * @param key The key to find providers for
+   * @return
+   */
   def dhtFindProvs(key: String) : JsonNode = getRequestAsJson("/dht/findprovs", toArgs(key))
 
+  /**
+   * @param peerId The peer to search for
+   * @return
+   */
   def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsJson("/dht/findpeers", toArgs(peerId))
 
+  /**
+   * Run a 'findClosestPeers' query through the DHT
+   * @param peerId The peerID to run the query against
+   * @return
+   */
   def dhtQuery(peerId:  String) : JsonNode = getRequestAsJson("/dht/query", toArgs(peerId))
 
   //
   //tool commands
   //
 
-
+  /**
+   * Outputs the content of the host configuration parameters
+   * WARNING: Your private key will be included in the output of this command.
+   * @return
+   */
   def configShow : ConfigShow =  getRequestAsType("/config/show", classOf[ConfigShow])
 
+  /**
+   * Shows ipfs version information
+   * @return
+   */
   def version : String =  getRequestAsJson("/version", Seq()).get("Version").asText()
 
+  /**
+   * Lists all available commands (and subcommands)
+   * @return
+   */
   def commands : JsonNode = getRequestAsJson("/commands", Seq())
 
 
