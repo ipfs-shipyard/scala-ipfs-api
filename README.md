@@ -7,8 +7,14 @@ A JVM client library for interacting with IPFS from Java/Scala environments.
 A full java-doc site is available [here](http://ipfs.github.io/scala-ipfs-api/#org.ipfs.api.Client).
 
 ### Including in your Java/Scala project
+##### SBT:
+```
+resolvers += "scala-ipfs-api" at "https://ipfs.io/ipfs/QmbWUQEuTtFwNNg94nbpVY25b5PAyPQTd7HhkDsGhRG8Ur/"
+libraryDependencies += "io.ipfs" %% "scala-ipfs-api" % "1.0.0-SNAPSHOT",
+```
 
-Copy ipfs.api.jar into your Java classpath.
+##### Manually:
+Although this is considered a bad practice, you may still want to manually put fat-jar generated from assembly task into your classpath, take a look at stand-alone jar creation below.
 
 ### Java usage
 
@@ -16,19 +22,15 @@ A working Java example available [here](https://github.com/ipfs/scala-ipfs-api/b
  
 IPFS API calls are available using a Client instance.
 
-<pre>
-Client client = new Client("localhost", 5001, "/api/v0", "http");
-</pre>
+`Client client = new Client("localhost", 5001, "/api/v0", "http");`
 
 Almost all of the API calls return strongly typed POJOs, for example the node configuration can be retrieved with 
 
-<pre>
-ConfigShow configShow = client.configShow(); 
-</pre>
+`ConfigShow configShow = client.configShow();`
 
 #####  Adding and retrieving data
 
-<pre>
+```
         //create test file
         Path addPath = Paths.get("ipfs.put.tmp.txt");
         Files.write(addPath, "Hello IPFS!".getBytes(), StandardOpenOption.CREATE);
@@ -43,7 +45,7 @@ ConfigShow configShow = client.configShow();
         try (InputStream inputStream = client.cat(added.Hash())) {
             Files.copy(inputStream, getPath, StandardCopyOption.REPLACE_EXISTING);
         }
-</pre>
+```
 
 ### Building
 
@@ -57,26 +59,21 @@ Compile the project with
 
 ##### package sources only
 
-To build a Java archive of **only the project sources**,  use
+To build a Java archive, use
 
 > sbt packageBin  
 
-which will create a jar somewhere like target/scala-2.10/scala-ipfs-api_2.10-1.0.0-SNAPSHOT.jar
+which will create a jar like target/scala-2.10/scala-ipfs-api_2.10-1.0.0-SNAPSHOT.jar
 
-##### stand-alone jar 
-
-To create a stand-alone jar that includes all dependencies needed for including in a Java/Scala project do 
-
+##### stand-alone jar
+To create a stand-alone jar that includes all dependencies, do
 > sbt assembly
 
 which will create a jar 
 
 > target/scala-2.10/ipfs.api.jar 
-
-Note, this includes the (only) project dependency [Jackson](https://github.com/FasterXML/jackson)
-
 ### Testing
 
-Unit / Integration tests can be run  with
+Unit / Integration tests can be run with
 
 > sbt test
