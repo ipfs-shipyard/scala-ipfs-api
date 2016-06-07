@@ -20,13 +20,9 @@ class Client(val host : String,
              val base: String = "/api/v0",
              val protocol: String = "http") {
 
-  //TODO
-  //mount
 
-  //
-  //
-  //basic commands
-  //
+  ////////////////
+  // Basic commands
 
   /**
    * Adds local file contents to ipfs
@@ -34,7 +30,7 @@ class Client(val host : String,
    * @param paths Files to be added
    * @return
    */
-  def add(paths: Array[Path]) : Array[Add] = jsonMapper.reader(classOf[Add])
+  def add(paths: Array[Path]): Array[Add] = jsonMapper.reader(classOf[Add])
     .readValues(upload("/add", paths).reader())
     .readAll()
     .toArray[Add](new Array[Add](0))
@@ -51,7 +47,7 @@ class Client(val host : String,
    * @param key The path of the ipfs object to be outputted
    * @return
    */
-  def cat(key: String) : InputStream = getRequestInputStream("/cat", toArgs(key))
+  def cat(key: String): InputStream = getRequestInputStream("/cat", toArgs(key))
 
   /**
    * Stream ipfs object data
@@ -59,14 +55,14 @@ class Client(val host : String,
    * @return
    */
 
-  def get(key: String) : InputStream = getRequestInputStream("/get", toArgs(key))
+  def get(key: String): InputStream = getRequestInputStream("/get", toArgs(key))
 
   /**
    * Writes ipfs object data to a local file
    * @param key The path of the ipfs object to be outputted
    * @param output Path to store ipfs object data
    */
-  def get(key: String, output: Path) {
+  def get(key: String, output: Path): Unit = {
     val in: InputStream = getRequestInputStream("/get", toArgs(key))
     Files.copy(in, output, StandardCopyOption.REPLACE_EXISTING)
     in.close()
@@ -77,7 +73,7 @@ class Client(val host : String,
    * @param key The path of the ipfs object to list links from
    * @return
    */
-  def ls(key:  String): Ls =  getRequestAsType("/ls", classOf[Ls], toArgs(key))
+  def ls(key: String): Ls = getRequestAsType("/ls", classOf[Ls], toArgs(key))
 
   /**
    * Lists links (references) from an ipfs object
@@ -86,16 +82,15 @@ class Client(val host : String,
    */
   def refs(key: String): Array[Ref] = getRequestAsSeq("/refs", classOf[Ref], toArgs(key)).toArray
 
-  //
-  //data structure commands
-  //
+  ////////////////
+  // Data structure commands
 
   /**
    * Get a raw IPFS block
    * @param key The base58 multihash of an existing ipfs block to get
    * @return
    */
-  def blockGet(key: String) : InputStream = getRequestInputStream("/block/get",  toArgs(key))
+  def blockGet(key: String): InputStream = getRequestInputStream("/block/get", toArgs(key))
 
   /**
    * Print information of a raw IPFS block
@@ -117,28 +112,28 @@ class Client(val host : String,
    * @param key key of the object to retrieve, in base58-encoded multihash format
    * @return
    */
-  def objectData(key : String) : InputStream = getRequestInputStream("/object/data", toArgs(key))
+  def objectData(key: String): InputStream = getRequestInputStream("/object/data", toArgs(key))
 
   /**
    *  Get and serialize the DAG node named by <key>
    * @param key Key of the object to retrieve (in base58-encoded multihash format)
    * @return
    */
-  def objectGet(key: String) : ObjectGet = getRequestAsType("/object/get", classOf[ObjectGet], toArgs(key))
+  def objectGet(key: String): ObjectGet = getRequestAsType("/object/get", classOf[ObjectGet], toArgs(key))
 
   /**
    * Get stats for the DAG node named by <key>
    * @param key Key of the object to retrieve (in base58-encoded multihash format)
    * @return
    */
-  def objectStat(key: String) : ObjectStat = getRequestAsType("/object/stat", classOf[ObjectStat], toArgs(key))
+  def objectStat(key: String): ObjectStat = getRequestAsType("/object/stat", classOf[ObjectStat], toArgs(key))
 
   /**
    * Outputs the links pointed to by the specified object
    * @param key Key of the object to retrieve, in base58-encoded multihash format
    * @return
    */
-  def objectLinks(key: String): Object  = getRequestAsType("/object/links", classOf[Object], toArgs(key))
+  def objectLinks(key: String): Object = getRequestAsType("/object/links", classOf[Object], toArgs(key))
 
   /**
    * Stores input as a DAG object, outputs its key
@@ -155,8 +150,8 @@ class Client(val host : String,
 
    * @return org.ipfs.api.Object
    */
-  def objectPut(path: Path) :  Object = {
-    val paths : Array[Path] = Array(path)
+  def objectPut(path: Path): Object = {
+    val paths: Array[Path] = Array(path)
     jsonMapper.readValue(upload("/object/put", paths).reader(), classOf[Object])
   }
 
@@ -165,56 +160,57 @@ class Client(val host : String,
    * @param key The path to the IPFS object(s) to list links from
    * @return
    */
-  def fileLs(key: String) : FileLs = getRequestAsType("/file/ls", classOf[FileLs], Array("arg" -> key))
+  def fileLs(key: String): FileLs = getRequestAsType("/file/ls", classOf[FileLs], Array("arg" -> key))
 
   /**
    * Perform a garbage collection sweep on the repo
    */
-  def gc {getRequestSource("/repo/gc", Seq())}
+  def gc(): Unit = {
+    getRequestSource("/repo/gc", Seq())
+  }
 
-  //
-  //advanced commands
-  //
+  ////////////////
+  // Advanced commands
 
   /**
    * Gets the value currently published at an IPNS name
    * @param key The name to resolve
    * @return
    */
-  def resolve(key: String)  : Resolve =  getRequestAsType("/name/resolve", classOf[Resolve], Array("arg" -> key))
+  def resolve(key: String): Resolve = getRequestAsType("/name/resolve", classOf[Resolve], Array("arg" -> key))
 
   /**
    * Publish an object to IPNS
    * @param key
    * @return
    */
-  def publish(key: String) : Publish = getRequestAsType("/name/publish", classOf[Publish], Array("arg" -> key))
+  def publish(key: String): Publish = getRequestAsType("/name/publish", classOf[Publish], Array("arg" -> key))
 
   /**
    * Resolve a DNS link
    * @param address The domain-name name to resolve.
    * @return
    */
-  def dnsResolve(address: String) : String = getRequestAsJson("/dns", toArgs(address)).get("Path").asText()
+  def dnsResolve(address: String): String = getRequestAsJson("/dns", toArgs(address)).get("Path").asText()
 
   /**
    * Show ID info of IPFS node
    * @return
    */
-  def id : Id = getRequestAsType("/id", classOf[Id])
+  def id: Id = getRequestAsType("/id", classOf[Id])
 
   /**
    *  List objects pinned to local storage
    * @return
    */
-  def lsPins : JsonNode = getRequestAsJson("/pin/ls", Seq()).get("Keys")
+  def lsPins: JsonNode = getRequestAsJson("/pin/ls", Seq()).get("Keys")
 
   /**
    * Pins objects to local storage
    * @param key Path to object to be pinned
    * @return Path of object that have been pinned objects
    */
-  def addPin(key: String) : Array[String] = getRequestAsJson("/pin/add", toArgs(key)).get("Pinned")
+  def addPin(key: String): Array[String] = getRequestAsJson("/pin/add", toArgs(key)).get("Pinned")
     .asScala
     .toArray
     .map(_.toString)
@@ -224,15 +220,15 @@ class Client(val host : String,
    * @param key Path to object to be unpinned
    * @return Path of object that have been unpinned objects
    */
-  def removePin(key: String) : Array[String] = getRequestAsJson("/pin/rm", toArgs(key)).get("Pinned")
+  def removePin(key: String): Array[String] = getRequestAsJson("/pin/rm", toArgs(key)).get("Pinned")
     .asScala
     .toArray
     .map(_.toString)
-  //
-  //network  commands
-  //
 
-  def bootstrap : Bootstrap = getRequestAsType("/bootstrap", classOf[Bootstrap])
+  ////////////////
+  // Network  commands
+
+  def bootstrap: Bootstrap = getRequestAsType("/bootstrap", classOf[Bootstrap])
 
   /**
    * Lists the set of peers this node is connected to
@@ -251,21 +247,21 @@ class Client(val host : String,
    * @param address The address to connect in ipfs multiaddr format
    * @return
    */
-  def swarmConnect(address: String) : JsonNode = getRequestAsJson("/swarm/connect", toArgs(address))
+  def swarmConnect(address: String): JsonNode = getRequestAsJson("/swarm/connect", toArgs(address))
 
   /**
    * Closes a connection to a peer address
    * @param address The address to disconnect from in ipfs multiaddr format
    * @return
    */
-  def swarmDisconnect(address: String) : JsonNode = getRequestAsJson("/swarm/disconnect", toArgs(address))
+  def swarmDisconnect(address: String): JsonNode = getRequestAsJson("/swarm/disconnect", toArgs(address))
 
   /**
    * Send an echo request packets to a IPFS host
    * @param peerId ID of peer to be pinged
    * @return
    */
-  def ping(peerId: String) : Array[Ping] = getRequestAsSeq("/ping", classOf[Ping], toArgs(peerId)).toArray
+  def ping(peerId: String): Array[Ping] = getRequestAsSeq("/ping", classOf[Ping], toArgs(peerId)).toArray
 
   /**
    * Store the given key value pair in the dht
@@ -273,60 +269,59 @@ class Client(val host : String,
    * @param value The value to store
    * @return
    */
-  def dhtPut(key: String, value: String) : Array[DHTResponse] =  getRequestAsSeq("/dht/put", classOf[DHTResponse], Array("arg" -> key, "arg" -> value)).toArray
+  def dhtPut(key: String, value: String): Array[DHTResponse] = getRequestAsSeq("/dht/put", classOf[DHTResponse], Array("arg" -> key, "arg" -> value)).toArray
 
   /**
    * Retrieve the value stored in the dht at the given key
    * @param key The key to find a value for
    * @return
    */
-  def dhtGet(key: String) : DHTResponse = getRequestAsType("/dht/get", classOf[DHTResponse], toArgs(key))
+  def dhtGet(key: String): DHTResponse = getRequestAsType("/dht/get", classOf[DHTResponse], toArgs(key))
 
   /**
    * Retrieve a list of peers who are able to provide the value requested
    * @param key The key to find providers for
    * @return
    */
-  def dhtFindProvs(key: String) : JsonNode = getRequestAsJson("/dht/findprovs", toArgs(key))
+  def dhtFindProvs(key: String): JsonNode = getRequestAsJson("/dht/findprovs", toArgs(key))
 
   /**
    * @param peerId The peer to search for
    * @return
    */
-  def dhtFindPeers(peerId:  String) : JsonNode = getRequestAsJson("/dht/findpeers", toArgs(peerId))
+  def dhtFindPeers(peerId: String): JsonNode = getRequestAsJson("/dht/findpeers", toArgs(peerId))
 
   /**
    * Run a 'findClosestPeers' query through the DHT
    * @param peerId The peerID to run the query against
    * @return
    */
-  def dhtQuery(peerId:  String) : JsonNode = getRequestAsJson("/dht/query", toArgs(peerId))
+  def dhtQuery(peerId: String): JsonNode = getRequestAsJson("/dht/query", toArgs(peerId))
 
-  //
-  //tool commands
-  //
+  ////////////////
+  // Tool commands
 
   /**
    * Outputs the content of the host configuration parameters
    * WARNING: Your private key will be included in the output of this command.
    * @return
    */
-  def configShow : ConfigShow =  getRequestAsType("/config/show", classOf[ConfigShow])
+  def configShow: ConfigShow = getRequestAsType("/config/show", classOf[ConfigShow])
 
   /**
    * Shows ipfs version information
    * @return
    */
-  def version : String =  getRequestAsJson("/version", Seq()).get("Version").asText()
+  def version: String = getRequestAsJson("/version", Seq()).get("Version").asText()
 
   /**
    * Lists all available commands (and subcommands)
    * @return
    */
-  def commands : JsonNode = getRequestAsJson("/commands", Seq())
+  def commands: JsonNode = getRequestAsJson("/commands", Seq())
 
 
-  private def buildUrl(stem: String, query: Seq[(String, String)]) : URL = Client.buildUrl(protocol, host, port, base, stem, query)
+  private def buildUrl(stem: String, query: Seq[(String, String)]): URL = Client.buildUrl(protocol, host, port, base, stem, query)
 
   private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
     val url = buildUrl(stem, query)
@@ -336,7 +331,7 @@ class Client(val host : String,
   private def getRequestAsType[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): T = {
     jsonMapper.readValue(getRequestSource(stem, query).reader(), clazz)
   }
-  private def getRequestAsSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()) : Seq[T] = {
+  private def getRequestAsSeq[T](stem: String, clazz: Class[T], query: Seq[(String, String)] = Seq()): Seq[T] = {
     //necessary for a few IPFS API calls that  return a concatenated array of json docs instead of a
     //valid JSON doc
     jsonMapper.reader(clazz)
@@ -350,9 +345,9 @@ class Client(val host : String,
     scala.io.Source.fromURL(url)
   }
 
-  private def getRequestAsJson(stem: String, query : Seq[(String, String)]) : JsonNode = jsonMapper.readTree(getRequestSource(stem, query).reader())
+  private def getRequestAsJson(stem: String, query: Seq[(String, String)]): JsonNode = jsonMapper.readTree(getRequestSource(stem, query).reader())
 
-  private def upload(stem: String, namedInputStreams: Array[(String, InputStream)])  : BufferedSource = {
+  private def upload(stem: String, namedInputStreams: Array[(String, InputStream)]): BufferedSource = {
     val url = buildUrl(stem, Array("stream-channels" -> "true"))
 
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
@@ -366,7 +361,8 @@ class Client(val host : String,
     val out = conn.getOutputStream
     val writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true)
 
-    val add = (name: String,  in : InputStream) => {
+    namedInputStreams.foreach(e => {
+      val (name, in) = e
       val headers: Array[String] = Array(
         "--" + boundary,
         "Content-Disposition: file; name=\""+name+"\"; filename=\""+ name+"\"",
@@ -379,22 +375,19 @@ class Client(val host : String,
       try {
         val buffer = new Array[Byte](0x1000)
         var nRead = 0
-        while ( {
-          nRead = in.read(buffer); nRead
-        } != -1)
+        while({ nRead = in.read(buffer); nRead } != -1)
           out.write(buffer, 0, nRead)
+
       } finally {
         out.flush()
         writer.append(LINE)
         writer.flush()
-        in.close
+        in.close()
       }
-    }
-
-    namedInputStreams.foreach(e  => add(e._1, e._2))
+    })
 
     Array("--", boundary, "--", LINE).foreach(writer.append(_))
-    writer.close
+    writer.close()
 
     Source.fromInputStream(conn.getInputStream)
   }
@@ -411,14 +404,14 @@ case class SwarmPeers(Strings: List[String])
 
 case class BlockStat(Key: String, Size: Int)
 
-case class Link(Name: String,  Hash: String, Size: Int, Type: String)
+case class Link(Name: String, Hash: String, Size: Int, Type: String)
 case class Object(Hash: String, Size: Option[Int], Type: Option[String], Links: Array[Link])
 case class ObjectGet(Links:Array[Link], Data: String)
-case class ObjectStat(Hash: String, NumLinks: Int,  BlockSize: Int, LinksSize: Int,  DataSize: Int,  CumulativeSize: Int)
+case class ObjectStat(Hash: String, NumLinks: Int, BlockSize: Int, LinksSize: Int, DataSize: Int, CumulativeSize: Int)
 
 case class Ls(Objects: Array[Object])
 
-case class Id(ID: String,  PublicKey: String,  Addresses: List[String], AgentVersion: String, ProtocolVersion: String)
+case class Id(ID: String, PublicKey: String, Addresses: List[String], AgentVersion: String, ProtocolVersion: String)
 
 case class Bootstrap(Peers: List[String])
 
@@ -429,15 +422,15 @@ case class Addrs() {
 case class SwarmAddrs(Addrs: Addrs)
 
 case class Resolve(Path: String)
-case class Publish(Name: String, Value:  String)
-case class Identity(PeerID: String,  PrivKey: String)
-case class Datastore(Type: String,  Path: String)
-case class Addresses(Swarm:  Array[String], API: String,  Gateway:String)
-case class Mounts(IPFS: String,  IPNS: String,  FuseAllowOther: Boolean)
-case class Version(Current: String, Check: String, CheckDate: String,  CheckPeriod: String, AutoUpdate: String)
+case class Publish(Name: String, Value: String)
+case class Identity(PeerID: String, PrivKey: String)
+case class Datastore(Type: String, Path: String)
+case class Addresses(Swarm: Array[String], API: String, Gateway:String)
+case class Mounts(IPFS: String, IPNS: String, FuseAllowOther: Boolean)
+case class Version(Current: String, Check: String, CheckDate: String, CheckPeriod: String, AutoUpdate: String)
 case class MDNS(Enabled: Boolean, Interval: Int)
 case class Discovery(MDNS: MDNS)
-case class Tour(Last:String)
+case class Tour(Last: String)
 case class Gateway(HTTPHeaders: String, RootRedirect: String, Writable: Boolean)
 case class SupernodeRouting(Servers: Array[String])
 case class API(HTTPHeaders: String)
@@ -459,7 +452,7 @@ case class ConfigShow(Identity: Identity,
 
 case class Ref(Ref: String, Err: String)
 
-case class Ping(Success: String, Time: Long, Text:  String)
+case class Ping(Success: String, Time: Long, Text: String)
 
 case class Arguments() {
   val map = new mutable.HashMap[String, String]()
@@ -471,7 +464,7 @@ case class Objects() {
 }
 case class FileLs(Arguments: Arguments, Objects: Objects)
 
-case class DHTResponseAddrs(Addrs: Array[String],  ID: String)
+case class DHTResponseAddrs(Addrs: Array[String], ID: String)
 case class DHTResponse(Extra: String, ID: String, Responses: Array[DHTResponseAddrs], Type: Int)
 
 object Client {
@@ -485,29 +478,29 @@ object Client {
     def toArray : Array[Byte] = {
       val out = new ByteArrayOutputStream()
       try {
-        val buff  = new Array[Byte](0x1000)
+        val buff = new Array[Byte](0x1000)
         var nRead = 0
         while ( {nRead = in.read(buff);nRead} != -1)
           out.write(buff, 0, nRead)
       } finally {
-        in.close
+        in.close()
       }
       out.toByteArray
     }
   }
-  implicit def inputStreamToFullyReadableInputStream(in: InputStream) = new FullyReadableInputStream(in)
 
+  implicit def inputStreamToFullyReadableInputStream(in: InputStream): FullyReadableInputStream = new FullyReadableInputStream(in)
 
-  private def toArgs(key: String*) : Seq[(String, String)] = key.map(("arg" -> _))
+  private def toArgs(key: String*): Seq[(String, String)] = key.map("arg" -> _)
 
   private def urlEncode(s: String) = URLEncoder.encode(s, "UTF-8")
 
-  implicit def pathToFile(path: Path) = path.toFile
+  implicit def pathToFile(path: Path): File = path.toFile
 
 
-  implicit def pathsToNamedInputStreams(paths:  Array[Path]) : Array[(String, InputStream)] = paths.map(path  => (path.getFileName.toString,  new FileInputStream(path)))
+  implicit def pathsToNamedInputStreams(paths: Array[Path]): Array[(String, InputStream)] = paths.map(path => (path.getFileName.toString,  new FileInputStream(path)))
 
-  def walkTree(path: Path) : Array[Path]  = path match {
+  def walkTree(path: Path) : Array[Path] = path match {
     case _ if path.isFile => Array(path)
     case _ if path.isDirectory => path.listFiles().flatMap(f => walkTree(f.toPath))
     case _ => Array()
@@ -518,9 +511,9 @@ object Client {
                port: Int,
                base: String,
                stem: String,
-               query : Seq[(String, String)]) = {
+               query: Seq[(String, String)]) = {
 
-    val queryStem = "?" + query.map(e => urlEncode(e._1) +"="+ urlEncode(e._2)).mkString("&")
+    val queryStem = "?" + query.map(e => urlEncode(e._1) + "=" + urlEncode(e._2)).mkString("&")
     val path = base + stem + queryStem
     new URL(protocol, host, port, path)
   }
@@ -530,7 +523,6 @@ object Client {
     val client = new Client("localhost")
 
     val sep = () => println("*"*50)
-
 
     val paths = Array("build.sbt", "README.md").map(Paths.get(_))
     val add = client.add(paths)
@@ -554,7 +546,7 @@ object Client {
     sep()
 
 
-    val  id =  client.id
+    val id = client.id
     println(id)
     sep()
 
@@ -566,7 +558,7 @@ object Client {
     println(swarmAddrs.Addrs.map)
     sep()
 
-    val gc = client.gc
+    val gc = client.gc()
     println(gc)
     sep()
 
@@ -586,12 +578,12 @@ object Client {
     println(swarmPeers)
     sep()
 
-    val blockGet =  client.blockGet(addedHash).toArray
+    val blockGet = client.blockGet(addedHash).toArray
 
     println(blockGet.length)
     sep()
 
-    val  objectData = client.objectData(addedHash).toArray
+    val objectData = client.objectData(addedHash).toArray
     println(objectData.length)
     sep()
 
@@ -626,7 +618,7 @@ object Client {
     sep()
 
     val dhtKey: String = "ckey3"
-    val  dhtput  = client.dhtPut(dhtKey, "cval3")
+    val dhtput  = client.dhtPut(dhtKey, "cval3")
     println(dhtput)
     sep()
 
@@ -642,11 +634,11 @@ object Client {
     println(pinAdd)
     sep()
 
-    val pins:  JsonNode = client.lsPins
+    val pins: JsonNode = client.lsPins
     println(pins)
     sep()
 
-    val pinRm  = client.removePin(addedHash)
+    val pinRm = client.removePin(addedHash)
     println(pinRm)
     sep()
   }

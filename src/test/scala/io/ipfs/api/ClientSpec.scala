@@ -16,34 +16,34 @@ class ClientSpec extends Specification {
   "IPFS client" should {
 
     "show the version" in  {
-      client.version mustEqual("0.3.8-dev")
+      client.version mustEqual "0.4.2"
     }
 
     "have an ID" in {
-      client.id.ID.length  mustNotEqual(0)
+      client.id.ID.length mustNotEqual 0
     }
 
     "store data" in {
       val name = randomName
       val add = store(name = name)
-      add.length mustEqual(1)
+      add.length mustEqual 1
       val added = add(0)
       added.Name mustEqual name
-      added.Hash.length mustNotEqual(0)
+      added.Hash.length mustNotEqual 0
     }
 
     "cat data" in {
-      val data =  randomBytes
+      val data = randomBytes
       val added = store(data = data)(0)
 
       val in: InputStream = client.cat(added.Hash)
-      util.Arrays.equals(toArray(in), data) mustEqual(true)
+      util.Arrays.equals(toArray(in), data) mustEqual true
     }
 
     "dht put and get" in {
       val (key, value) = (random.nextString(10), random.nextString(10))
       val puts: Array[DHTResponse] = client.dhtPut(key, value)
-      puts.length mustNotEqual(0)
+      puts.length mustNotEqual 0
 
       client.dhtGet(key).Extra mustEqual value
     }
@@ -55,12 +55,11 @@ class ClientSpec extends Specification {
     buffer
   }
 
-  private def store(name: String = randomName, data : Array[Byte] = randomBytes) : Array[Add] = {
+  private def store(name: String = randomName, data: Array[Byte] = randomBytes): Array[Add] = {
     val storePath = Paths.get(name)
     Files.write(storePath, data, StandardOpenOption.CREATE)
     client.add(Array(storePath))
   }
-
 }
 
 object ClientSpec {
@@ -75,7 +74,7 @@ object ClientSpec {
       while ( {nRead = in.read(buff);nRead} != -1)
         out.write(buff, 0, nRead)
     } finally {
-      in.close
+      in.close()
     }
     out.toByteArray
   }

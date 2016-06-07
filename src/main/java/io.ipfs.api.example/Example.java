@@ -11,7 +11,7 @@ import java.nio.file.*;
 import java.util.Arrays;
 
 public class Example {
-    public static void main(String[] args)  throws IOException {
+    public static void main(String[] args) throws IOException {
         String host = args.length > 0 ? args[0]: "localhost";
         System.out.println("Using host " + host);
 
@@ -28,7 +28,7 @@ public class Example {
         //add to IPFS
         Add[] add = client.add(new Path[]{addPath});
         Add added = add[0];
-        System.out.println("Added "+ added.Name() +" with hash "+  added.Hash());
+        System.out.println("Added " + added.Name() + " with hash " +  added.Hash());
 
         //get from IPFS
         Path getPath = Paths.get("ipfs.get.tmp.txt");
