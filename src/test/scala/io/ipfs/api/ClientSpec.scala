@@ -1,13 +1,13 @@
-package org.ipfs.api
+package io.ipfs.api
 
 import java.io.{ByteArrayOutputStream, InputStream}
-import java.nio.file.{Path, StandardOpenOption, Paths, Files}
+import java.nio.file.{Files, Paths, StandardOpenOption}
 import java.util
 
+import io.ipfs.api.ClientSpec._
 import org.specs2.mutable._
 
 import scala.util.Random
-import ClientSpec._
 
 class ClientSpec extends Specification {
   isolated

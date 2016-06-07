@@ -1,21 +1,19 @@
-package org.ipfs.api
+package io.ipfs.api
 
 import java.io._
-import java.net.{HttpURLConnection, URLEncoder, URL}
-import java.nio.file.{StandardCopyOption, Files, Paths, Path}
-import collection.JavaConverters._
+import java.net.{HttpURLConnection, URL, URLEncoder}
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
+import collection.JavaConverters._
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-
 import java.util.Random
 
 import scala.collection.mutable
-
 import Client._
 
-import scala.io.BufferedSource
+import scala.io.{BufferedSource, Source}
 
 class Client(val host : String,
              val port: Int = 5001,
@@ -398,7 +396,7 @@ class Client(val host : String,
     Array("--", boundary, "--", LINE).foreach(writer.append(_))
     writer.close
 
-    io.Source.fromInputStream(conn.getInputStream)
+    Source.fromInputStream(conn.getInputStream)
   }
 
   lazy private val boundary = {
@@ -547,12 +545,12 @@ object Client {
     println(resolve)
 
     val cat: InputStream = client.cat(addedHash)
-    println(io.Source.fromInputStream(cat).mkString)
+    println(Source.fromInputStream(cat).mkString)
 
     sep()
 
     val get: InputStream = client.get(addedHash)
-    println(io.Source.fromInputStream(get).mkString)
+    println(Source.fromInputStream(get).mkString)
     sep()
 
 

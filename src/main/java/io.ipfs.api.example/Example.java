@@ -1,9 +1,9 @@
-package org.ipfs.api.example;
+package io.ipfs.api.example;
 
 
-import org.ipfs.api.Add;
-import org.ipfs.api.Client;
-import org.ipfs.api.ConfigShow;
+import io.ipfs.api.Add;
+import io.ipfs.api.Client;
+import io.ipfs.api.ConfigShow;
 
 import java.io.IOException;
 import java.io.InputStream;
