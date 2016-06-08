@@ -323,7 +323,7 @@ class Client(val host : String,
 
   private def buildUrl(stem: String, query: Seq[(String, String)]): URL = Client.buildUrl(protocol, host, port, base, stem, query)
 
-  private def  getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
+  private def getRequestInputStream(stem: String, query: Seq[(String, String)]) = {
     val url = buildUrl(stem, query)
     url.openConnection().asInstanceOf[HttpURLConnection].getInputStream
   }
